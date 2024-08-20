@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "HandMotion",
+    "description": "A hand detector for web and desktop browsing",
+    "version": "0.1",
+    "action": {
+      "default_popup": "handmotion.html",
+      "default_icon": "handmotion.png"
+    },
+    "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+    ],
+    "background": {
+    "service_worker": "background.js"
+    },
+    "host_permissions": [
+    "http://localhost/*"
+    ]
+  }

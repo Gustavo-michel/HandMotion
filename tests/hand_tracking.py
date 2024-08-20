@@ -47,4 +47,8 @@ while True:
                     click_triggered = False
 
     cv2.imshow("Imagem", img)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+    video.release()
+    cv2.destroyAllWindows()
