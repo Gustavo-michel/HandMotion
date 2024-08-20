@@ -1,11 +1,19 @@
-from flask import Flask, jsonify, Response
+from flask import Flask, Response, render_template
+from flask_socketio import SocketIO, emit
 import cv2
 import mediapipe as mp
 import pyautogui
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
-@app.route('/start-tracking', methods=['GET'])
+video = cv2.VideoCapture(0)
+
+@app.route('/')
+def index():
+    return render_template('handmotion.html')
+
+@socketio.on('start_tracking')
 def start_tracking():
     hand = mp.solutions.hands
     Hand = hand.Hands(max_num_hands=1)
@@ -48,30 +56,9 @@ def start_tracking():
                     elif not click_condition:
                         click_triggered = False
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-        return jsonify({"status": "tracking started"})
-
-
-def generate_frames():
-    video = cv2.VideoCapture(0)
-    
-    while True:
-        success, frame = video.read()
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
+        ret, buffer = cv2.imencode('.jpg', img)
+        frame = buffer.tobytes()
+        socketio.emit('video_frame', frame)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5000)

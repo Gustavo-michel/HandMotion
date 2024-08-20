@@ -1,6 +1,37 @@
-<html>
-  <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Motion</title>
+</head>
+<body>
     <h1>Hand Motion Video Feed</h1>
-    <img src="http://localhost:5000/video_feed" alt="Video Feed">
-  </body>
+    <img id="video_feed" alt="Video Feed">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script type="text/javascript">
+        const socket = io();
+
+        socket.emit('start_tracking');
+
+        socket.on('video_frame', function(frame) {
+            const img = document.getElementById('video_feed');
+            img.src = 'data:image/jpeg;base64,' + btoa(
+                new Uint8Array(frame).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+        });
+
+        document.getElementById("startButton").addEventListener("click", function() {
+        chrome.runtime.sendMessage({ type: "start_tracking" }, function(response) {
+            console.log(response.status);
+            });
+        });
+        
+        socket.onmessage = function(event) {
+            const imageUrl = "data:image/jpeg;base64," + event.data;
+            document.getElementById("videoFeed").src = imageUrl;
+        };
+    </script>
+</body>
 </html>
