@@ -4,8 +4,8 @@
     "description": "A hand detector for web and desktop browsing",
     "version": "0.1",
     "action": {
-      "default_popup": "handmotion.html",
-      "default_icon": "handmotion.png"
+      "default_popup": "popup/handmotion.html",
+      "default_icon": "popup/handmotion.png"
     },
     "permissions": [
     "activeTab",
