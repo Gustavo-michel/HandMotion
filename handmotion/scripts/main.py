@@ -1,5 +1,5 @@
 from flask import Flask, Response, render_template
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 import cv2
 import mediapipe as mp
 import pyautogui
@@ -41,7 +41,6 @@ def start_tracking():
             for points in handsPoints:
                 mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
                 for id, cord in enumerate(points.landmark):
-                    cx, cy = int(cord.x * w), int(cord.y * h)
 
                     screen_x = screen_width - int(cord.x * (screen_width - 2 * safe_margin)) + safe_margin
                     screen_y = int(cord.y * (screen_height - 2 * safe_margin)) + safe_margin
@@ -61,4 +60,4 @@ def start_tracking():
         socketio.emit('video_frame', frame)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)

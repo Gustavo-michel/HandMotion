@@ -6,8 +6,8 @@
     <title>Hand Motion</title>
 </head>
 <body>
-    <h1>Hand Motion Video Feed</h1>
-    <img id="video_feed" alt="Video Feed">
+    <h1>Hand Motion</h1>
+    <!-- <video id="video_feed" alt="Video Feed"> -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
     <script type="text/javascript">
@@ -15,23 +15,23 @@
 
         socket.emit('start_tracking');
 
-        socket.on('video_frame', function(frame) {
-            const img = document.getElementById('video_feed');
-            img.src = 'data:image/jpeg;base64,' + btoa(
-                new Uint8Array(frame).reduce((data, byte) => data + String.fromCharCode(byte), '')
-            );
-        });
+        // socket.on('video_frame', function(frame) {
+        //     const img = document.getElementById('video_feed');
+        //     img.src = 'data:image/jpeg;base64,' + btoa(
+        //         new Uint8Array(frame).reduce((data, byte) => data + String.fromCharCode(byte), '')
+        //     );
+        // });
 
-        document.getElementById("startButton").addEventListener("click", function() {
-        chrome.runtime.sendMessage({ type: "start_tracking" }, function(response) {
-            console.log(response.status);
-            });
-        });
+        // document.getElementById("startButton").addEventListener("click", function() {
+        // chrome.runtime.sendMessage({ type: "start_tracking" }, function(response) {
+        //     console.log(response.status);
+        //     });
+        // });
         
-        socket.onmessage = function(event) {
-            const imageUrl = "data:image/jpeg;base64," + event.data;
-            document.getElementById("videoFeed").src = imageUrl;
-        };
+        // socket.onmessage = function(event) {
+        //     const imageUrl = "data:image/jpeg;base64," + event.data;
+        //     document.getElementById("videoFeed").src = imageUrl;
+        // };
     </script>
 </body>
 </html>

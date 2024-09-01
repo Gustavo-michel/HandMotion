@@ -30,8 +30,8 @@ while True:
         for points in handsPoints:
             mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
             for id, cord in enumerate(points.landmark):
-                cx, cy = int(cord.x * w), int(cord.y * h)
-                cv2.putText(img,str(id),(cx,cy),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,0,0),2)
+                # cx, cy = int(cord.x * w), int(cord.y * h)
+                # cv2.putText(img,str(id),(cx,cy),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,0,0),2)
 
                 screen_x = screen_width - int(cord.x * (screen_width - 2 * safe_margin)) + safe_margin
                 screen_y = int(cord.y * (screen_height - 2 * safe_margin)) + safe_margin
@@ -50,5 +50,5 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    video.release()
-    cv2.destroyAllWindows()
+video.release()
+cv2.destroyAllWindows()
