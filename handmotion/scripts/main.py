@@ -35,13 +35,11 @@ def start_tracking():
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = Hand.process(imgRGB)
         handsPoints = results.multi_hand_landmarks
-        h, w, _ = img.shape 
 
         if handsPoints:
             for points in handsPoints:
                 mpDraw.draw_landmarks(img, points, hand.HAND_CONNECTIONS)
                 for id, cord in enumerate(points.landmark):
-
                     screen_x = screen_width - int(cord.x * (screen_width - 2 * safe_margin)) + safe_margin
                     screen_y = int(cord.y * (screen_height - 2 * safe_margin)) + safe_margin
 
