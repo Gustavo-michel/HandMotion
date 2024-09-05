@@ -15,7 +15,10 @@
     <script type="text/javascript">
         const socket = io();
 
-        socket.emit('start_tracking'); 
+        function startTracking() {
+            socket.emit('start_tracking');
+            console.log("Rastreamento iniciado");
+        }
 
         socket.on('video_frame', function(frame) {
             const img = document.getElementById('video_feed');
