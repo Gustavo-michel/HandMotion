@@ -1,7 +1,7 @@
 let socket;
 
 chrome.runtime.onInstalled.addListener(() => {
-    socket = new WebSocket("ws://localhost:5000");
+    socket = new WebSocket("ws://0.0.0.0:5000");
 
     socket.onopen = () => {
         console.log("WebSocket connection opened.");

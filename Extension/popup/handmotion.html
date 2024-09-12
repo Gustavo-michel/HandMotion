@@ -12,7 +12,8 @@
         <img id="video_feed" alt="Video Feed" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
-    <script type="text/javascript">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-Oy3Aqsj02Yn7ievqyOHO/jM3RaMZILQwrSaSkSg/rLc=';">
+    <script nonce="randomString">
         const socket = io();
 
         function startTracking() {
