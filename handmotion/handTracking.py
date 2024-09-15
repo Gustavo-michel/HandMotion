@@ -46,8 +46,7 @@ while True:
                 elif not click_condition:
                     click_triggered = False
 
-    cv2.imshow("Imagem", img)
+    cv2.imshow("Hand tracking", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    input('\n Pressione enter para sair')
