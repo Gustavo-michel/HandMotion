@@ -41,3 +41,6 @@ Bibliotecas Python:
 opencv-python
 mediapipe
 pyautogui
+
+## Executavel
+[Clique aqui para realizar o download do executavel](https://github.com/Gustavo-michel/HandMotion/raw/refs/heads/main/handmotion/HandTracking.exe?download=) 
