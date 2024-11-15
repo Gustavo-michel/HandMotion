@@ -60,11 +60,12 @@ while True:
                 gesture.extend([cord.x, cord.y, cord.z])
 
             # Prever o gesto
-            prediction = model.predict([gesture])
+            gesture_array = np.array([gesture])
+            prediction = model.predict(gesture_array)
             predicted_class = np.argmax(prediction)
 
             # Exibir o gesto reconhecido
-            cv2.putText(img, f"Gesture: {predicted_class}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(img, f"Gesture: {predicted_class+1}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     cv2.imshow("Hand tracking", img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
