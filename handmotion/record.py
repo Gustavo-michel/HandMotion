@@ -4,7 +4,7 @@ import mediapipe as mp
 import csv
 import tensorflow as tf
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 video = cv2.VideoCapture(0)
 hand = mp.solutions.hands
@@ -17,7 +17,8 @@ def save_gest(gestures):
     try:
         gesture_label = int(input("Insira o rótulo para este gesto (ex.: '1' para gesto 1, '2' para gesto 2): "))
         gesture_data.append((gestures, gesture_label))
-        print(f"Gesto {gesture_label} salvo com sucesso!")
+        same_label_count = sum(1 for _, label in gesture_data if label == gesture_label)
+        print(f"Gesto {gesture_label} salvo com sucesso! Total de gestos com esta label: {same_label_count}")
     except ValueError:
         print("Por favor, insira um número inteiro válido.")
 

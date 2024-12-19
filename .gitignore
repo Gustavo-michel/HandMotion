@@ -148,6 +148,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
+handmotion/*.py
+*.py
+
 # pytype static type analyzer
 .pytype/
 
