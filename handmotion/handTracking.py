@@ -1,11 +1,12 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import tensorflow as tf
 import pyautogui
 import os
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+import tensorflow as tf
 
 video = cv2.VideoCapture(0)
 hand = mp.solutions.hands

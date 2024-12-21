@@ -3,8 +3,9 @@
 Este projeto implementa um sistema de controle por gestos utilizando uma webcam para detectar e rastrear as mãos em tempo real. O movimento da mão é convertido em movimentos do cursor do mouse, e um gesto específico com os dedos pode ser utilizado para executar cliques no mouse. Além disso, o projeto conta com um executável, permitindo que o sistema seja utilizado sem a necessidade de rodar o código manualmente em um ambiente de desenvolvimento.
 
 ## Executavel
-[Ver na Release](https://github.com/Gustavo-michel/HandMotion/releases)
-[Clique aqui para realizar o download do executavel no raw](https://github.com/Gustavo-michel/HandMotion/raw/refs/heads/main/handmotion/HandTracking.exe?download=) 
+[Ver Releases](https://github.com/Gustavo-michel/HandMotion/releases)
+
+[Clique aqui para realizar o download do executavel atual](https://github.com/Gustavo-michel/HandMotion/raw/refs/heads/main/handmotion/HandTracking.exe?download=) 
 
 ## Tecnologias Utilizadas
 Python: Linguagem de programação utilizada para o desenvolvimento do projeto.
