@@ -26,6 +26,6 @@ model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=
 
 model.fit(X_train, y_train, epochs=100, validation_data=(X_val, y_val))
 
-model.save('gesture_model.h5')
+model.save('../model/gesture_model.h5')
 
 print("Modelo de gestos treinado e salvo como 'gesture_model.h5'.")

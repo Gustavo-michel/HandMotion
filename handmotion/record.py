@@ -55,13 +55,13 @@ while True:
 video.release()
 cv2.destroyAllWindows()
 
-with open("gestures.csv", mode="w", newline="") as file:
+with open("../data/gestures.csv", mode="w", newline="") as file:
     writer = csv.writer(file)
     for data, label in gesture_data:
         writer.writerow(data + [label])
 
 print("Dados dos gestos salvos com sucesso em 'gestures.csv'.")
 
-with open('gestures.csv', 'r') as file:
+with open('../data/gestures.csv', 'r') as file:
     num_gestos = sum(1 for i in file)
 print("Número de gestos salvos:", num_gestos)
