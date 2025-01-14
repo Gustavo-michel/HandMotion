@@ -4,6 +4,7 @@
     "description": "handmotion description",
     "version": "1.0",
     "permissions": [
+      "storage",
       "scripting",
       "activeTab"
     ],

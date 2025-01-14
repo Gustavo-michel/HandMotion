@@ -37,7 +37,6 @@ h3 {
     color: #5ad8e1;
 }
 
-
 #toggle-button {
     padding: 10px 15px;
     font-size: 1em;
@@ -60,18 +59,42 @@ h3 {
 #video-container {
     margin-top: 20px;
     width: 100%;
-    height: auto;
+    height: 200px;
     background-color: #000;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     border-radius: 5px;
+    border: 1px solid #ccc;
+    position: relative;
 }
 
 #video-container video {
-    max-width: 100%;
+    width: 100%;
+    height: auto;
     max-height: 100%;
     border: none;
     border-radius: 5px;
+}
+
+#video-container::before {
+    content: "Carregando vídeo...";
+    position: absolute;
+    color: #fff;
+    font-size: 0.9em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    transition: opacity 0.3s;
+    opacity: 1;
+}
+
+#video-container video:playing + ::before {
+    opacity: 0;
+    visibility: hidden;
 }
