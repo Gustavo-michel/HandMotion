@@ -17,5 +17,6 @@
         chrome.runtime.onMessage.addListener(function(message) {
             if (message.type === "gesture_detected") {
                 alert(`Gesto detectado: ${message.gesture}`);
+                document.getElementById("gesture-text").textContent = message.gesture;
             }
         });

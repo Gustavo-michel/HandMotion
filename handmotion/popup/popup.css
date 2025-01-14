@@ -30,6 +30,14 @@ h3 {
     color: #ff5722;
 }
 
+#gesture-text {
+    margin: 15px 0;
+    font-size: 1em;
+    font-weight: bold;
+    color: #5ad8e1;
+}
+
+
 #toggle-button {
     padding: 10px 15px;
     font-size: 1em;
