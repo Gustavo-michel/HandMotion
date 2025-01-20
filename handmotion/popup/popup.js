@@ -32,12 +32,12 @@ document.getElementById("toggle-button").addEventListener("click", function () {
             isTracking = true;
             document.getElementById("status-text").textContent = "Rastreamento Ativo";
             this.textContent = "Desativar Rastreamento";
-            startCamera();
+            // startCamera();
         } else if (data.status.includes("parado")) {
             isTracking = false;
             document.getElementById("status-text").textContent = "Aguardando gesto...";
             this.textContent = "Ativar Rastreamento";
-            stopCamera();
+            // stopCamera();
         } else {
             console.error(data.status);
         }
@@ -46,29 +46,3 @@ document.getElementById("toggle-button").addEventListener("click", function () {
     })
     .catch((error) => console.error("Erro ao controlar o servidor:", error));
 });
-
-// function startCamera() {
-//     navigator.mediaDevices
-//         .getUserMedia({ video: true })
-//         .then((stream) => {
-//             videoElement.srcObject = stream;
-//         })
-//         .catch((error) => {
-//             console.error("Erro ao acessar câmera:", error);
-//             if (error.name === 'NotFoundError') {
-//                 alert("Nenhuma câmera foi encontrada. Verifique se a câmera está conectada.");
-//             } else if (error.name === 'NotAllowedError') {
-//                 alert("A permissão para acessar a câmera foi negada.");
-//             } else {
-//                 alert("Erro desconhecido ao acessar a câmera.");
-//             }
-//         });
-// }
-
-// function stopCamera() {
-//     const stream = videoElement.srcObject;
-//     if (stream) {
-//         stream.getTracks().forEach((track) => track.stop());
-//         videoElement.srcObject = null;
-//     }
-// }
