@@ -1,11 +1,11 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: #f9f9f9;
     color: #333;
     margin: 0;
     padding: 10px;
-    width: 320px;
-    height: 360px;
+    width: 350px;
+    height: 500px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -18,23 +18,32 @@ h3 {
     margin: 0;
     font-size: 1.5em;
     color: #5c9fe7;
+    font-family: 'Roboto', sans-serif;
 }
 
-#status {
-    margin: 15px 0;
+#status, #gesture {
+    margin: 10px 0;
     font-size: 1em;
+    padding: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 #status-text {
+    font-size: 1.2em;
     font-weight: bold;
     color: #ff5722;
+    font-family: 'Roboto', sans-serif;
 }
 
 #gesture-text {
-    margin: 15px 0;
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #5ad8e1;
+    color: #28a745;
+    font-family: 'Roboto', sans-serif;
 }
 
 #toggle-button {
@@ -46,6 +55,7 @@ h3 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif;
 }
 
 #toggle-button:hover {
@@ -59,42 +69,13 @@ h3 {
 #video-container {
     margin-top: 20px;
     width: 100%;
-    height: 200px;
+    height: 300px;
     background-color: #000;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    position: relative;
-}
-
-#video-container video {
-    width: 100%;
-    height: auto;
-    max-height: 100%;
-    border: none;
-    border-radius: 5px;
-}
-
-#video-container::before {
-    content: "Carregando vídeo...";
-    position: absolute;
-    color: #fff;
-    font-size: 0.9em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1;
-    transition: opacity 0.3s;
-    opacity: 1;
-}
-
-#video-container video:playing + ::before {
-    opacity: 0;
-    visibility: hidden;
+    border-radius: 10px;
+    border: 2px solid #5c9fe7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

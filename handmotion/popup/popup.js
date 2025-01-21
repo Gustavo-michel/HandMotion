@@ -1,21 +1,27 @@
 let isTracking = false;
-const videoElement = document.getElementById("camera-feed");
+const statusElement = document.getElementById("status-text");
+const toggleButton = document.getElementById("toggle-button");
+const gestureElement = document.getElementById("gesture-text"); 
 
 chrome.storage.local.get(['isTracking'], function(result) {
     if (result.isTracking !== undefined) {
         isTracking = result.isTracking;
 
         if (isTracking) {
-            document.getElementById("status-text").textContent = "Rastreamento Ativo";
-            document.getElementById("toggle-button").textContent = "Desativar Rastreamento";
+            statusElement.textContent = "Rastreamento Ativo";
+            toggleButton.textContent = "Desativar Rastreamento";
         } else {
-            document.getElementById("status-text").textContent = "Aguardando...";
-            document.getElementById("toggle-button").textContent = "Ativar Rastreamento";
+            statusElement.textContent = "Aguardando...";
+            toggleButton.textContent = "Ativar Rastreamento";
         }
+    }
+
+    if (isTracking) {
+        setInterval(fetchGesture, 1000);
     }
 });
 
-document.getElementById("toggle-button").addEventListener("click", function () {
+toggleButton.addEventListener("click", function () {
     const action = isTracking ? "stop" : "start";
     
     fetch("http://localhost:5000/control", {
@@ -30,14 +36,14 @@ document.getElementById("toggle-button").addEventListener("click", function () {
         console.log(data.status);
         if (data.status.includes("iniciado")) {
             isTracking = true;
-            document.getElementById("status-text").textContent = "Rastreamento Ativo";
+            statusElement.textContent = "Rastreamento Ativo";
             this.textContent = "Desativar Rastreamento";
-            // startCamera();
+            statusElement.style.color = "#28a745";
         } else if (data.status.includes("parado")) {
             isTracking = false;
-            document.getElementById("status-text").textContent = "Aguardando gesto...";
+            statusElement.textContent = "Rastreamento Desativado...";
+            statusElement.style.color = "#ff5722";
             this.textContent = "Ativar Rastreamento";
-            // stopCamera();
         } else {
             console.error(data.status);
         }
@@ -46,3 +52,19 @@ document.getElementById("toggle-button").addEventListener("click", function () {
     })
     .catch((error) => console.error("Erro ao controlar o servidor:", error));
 });
+
+function fetchGesture() {
+    fetch("http://localhost:5000/status")
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.status === "Servidor ativo") {
+                gestureElement.textContent = `Gesto atual: ${data.gesture || "Nenhum"}`;
+            } else {
+                gestureElement.textContent = "Erro ao obter o gesto.";
+            }
+        })
+        .catch((error) => {
+            console.error("Erro ao buscar o gesto:", error);
+            gestureElement.textContent = "Erro de conexão.";
+        });
+}

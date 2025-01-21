@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HandMotion Extension</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="popup.css">
 </head>
 <body>
     <h3>HandMotion</h3>
-    <div id="status">Status: <span id="status-text">Aguardando gesto...</span></div>
+    <div id="status">Status: <span id="status-text">Rastreamento inativo</span></div>
+    <div id="gesture">Gesto atual: <span id="gesture-text">Nenhum</span></div>
     <button id="toggle-button">Ativar Rastreamento</button>
     <div id="video-container">
         <img id="camera-feed" src="http://localhost:5000/video_feed" alt="Feed da câmera">
