@@ -6,20 +6,25 @@ const gestureElement = document.getElementById("gesture-text");
 chrome.storage.local.get(['isTracking'], function(result) {
     if (result.isTracking !== undefined) {
         isTracking = result.isTracking;
-
-        if (isTracking) {
-            statusElement.textContent = "Rastreamento Ativo";
-            toggleButton.textContent = "Desativar Rastreamento";
-        } else {
-            statusElement.textContent = "Aguardando...";
-            toggleButton.textContent = "Ativar Rastreamento";
-        }
+        updateUI();
     }
 
     if (isTracking) {
         setInterval(fetchGesture, 1000);
     }
 });
+
+function updateUI() {
+    if (isTracking) {
+        statusElement.textContent = "Online tracking";
+        toggleButton.textContent = "Disable Tracking";
+        statusElement.style.color = "#28a745";
+    } else {
+        statusElement.textContent = "Offline Tracking";
+        toggleButton.textContent = "Enable tracking";
+        statusElement.style.color = "#ff5722";
+    }
+}
 
 toggleButton.addEventListener("click", function () {
     const action = isTracking ? "stop" : "start";
@@ -34,21 +39,21 @@ toggleButton.addEventListener("click", function () {
     .then((response) => response.json())
     .then((data) => {
         console.log(data.status);
+
         if (data.status.includes("iniciado")) {
             isTracking = true;
-            statusElement.textContent = "Rastreamento Ativo";
-            this.textContent = "Desativar Rastreamento";
-            statusElement.style.color = "#28a745";
         } else if (data.status.includes("parado")) {
             isTracking = false;
-            statusElement.textContent = "Rastreamento Desativado...";
-            statusElement.style.color = "#ff5722";
-            this.textContent = "Ativar Rastreamento";
         } else {
             console.error(data.status);
         }
 
         chrome.storage.local.set({ isTracking });
+        updateUI();
+
+        if (isTracking) {
+            setInterval(fetchGesture, 1000);
+        }
     })
     .catch((error) => console.error("Erro ao controlar o servidor:", error));
 });
@@ -58,7 +63,7 @@ function fetchGesture() {
         .then((response) => response.json())
         .then((data) => {
             if (data.status === "Servidor ativo") {
-                gestureElement.textContent = `Gesto atual: ${data.gesture || "Nenhum"}`;
+                gestureElement.textContent = `${data.gesture || "None"}`;
             } else {
                 gestureElement.textContent = "Erro ao obter o gesto.";
             }
