@@ -1,24 +1,26 @@
 FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
-    libxrender1 \
     libxext6 \
-    libgl1 \
-    xorg \
-    xvfb \
-    && apt-get clean
+    libxrender1 \
+    libgl1-mesa-glx \
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    ffmpeg \
+    libopencv-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY . /app
-
-ENV DISPLAY=:1
+COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY . .
+
 EXPOSE 5000
 
-CMD ["Xvfb", ":1", "-screen", "0", "1024x768x16", "&", "gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
