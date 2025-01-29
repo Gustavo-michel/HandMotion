@@ -1,50 +1,29 @@
 # HandMotion
+This project implements a gesture control system using a webcam to detect and track hands in real time. The hand movement is converted into mouse cursor movements, and a specific finger gesture can be used to perform mouse clicks. Additionally, the project includes an executable, allowing the system to be used without the need to manually run the code in a development environment.
 
-Este projeto implementa um sistema de controle por gestos utilizando uma webcam para detectar e rastrear as mãos em tempo real. O movimento da mão é convertido em movimentos do cursor do mouse, e um gesto específico com os dedos pode ser utilizado para executar cliques no mouse. Além disso, o projeto conta com um executável, permitindo que o sistema seja utilizado sem a necessidade de rodar o código manualmente em um ambiente de desenvolvimento.
+## Executable
+[View Releases](https://github.com/Gustavo-michel/HandMotion/releases)
 
-## Executavel
-[Ver Releases](https://github.com/Gustavo-michel/HandMotion/releases)
+## Technologies Used
+Python: Programming language used for project development.
 
-[Clique aqui para realizar o download do executavel atual](https://github.com/Gustavo-michel/HandMotion/raw/refs/heads/main/handmotion/HandTracking.exe?download=) 
+OpenCV: Library used for video capture and image processing.
 
-## Tecnologias Utilizadas
-Python: Linguagem de programação utilizada para o desenvolvimento do projeto.
-OpenCV: Biblioteca utilizada para captura de vídeo e manipulação de imagens.
-MediaPipe: Framework da Google utilizado para a detecção e rastreamento das mãos.
-PyAutoGUI: Biblioteca utilizada para controle do mouse no sistema operacional.
+MediaPipe: Google's framework used for hand detection and tracking.
 
-## Funcionalidades
-Detecção de Mãos em Tempo Real: O projeto usa a webcam para capturar vídeo em tempo real e rastrear a mão do usuário.
+PyAutoGUI: Library used for mouse control on the operating system.
 
-Controle do Cursor: O movimento da mão, detectado pela MediaPipe, é mapeado para a tela do computador. O dedo indicador (ponto 9 na MediaPipe) é utilizado para mover o cursor do mouse.
+## Features
+Real-Time Hand Detection: The project uses the webcam to capture real-time video and track the user's hand.
 
-Execução de Cliques: Um gesto específico (todos os dedos fechados) aciona um clique no mouse.
+Cursor Control: The hand movement detected by MediaPipe is mapped to the computer screen. The index finger (point 9 in MediaPipe) is used to move the mouse cursor.
 
-Margem de Segurança: Um ajuste de "margem de segurança" evita que o cursor se mova para além das bordas da tela.
+Click Execution: A specific gesture (all fingers closed) triggers a mouse click.
 
-Geração de Executável: O projeto pode ser empacotado como um executável para facilitar a execução em diferentes máquinas sem a necessidade de configurar dependências Python.
+Safety Margin: A "safety margin" adjustment prevents the cursor from moving beyond the edges of the screen.
 
-## Estrutura do Código
-Importação de Bibliotecas: Importação do OpenCV para captura de vídeo, MediaPipe para detecção de mãos, e PyAutoGUI para controle do mouse.
+Executable Generation: The project can be packaged as an executable to facilitate execution on different machines without the need to configure Python dependencies.
 
-Inicialização da Webcam: O OpenCV (cv2.VideoCapture(0)) é utilizado para abrir a webcam.
-
-Configuração do MediaPipe: MediaPipe Hands é configurado para detectar apenas uma mão por vez (max_num_hands=1).
-
-Configuração da Resolução da Tela: As dimensões da tela são obtidas através da função pyautogui.size().
-
-Rastreamento da Mão: A cada frame capturado pela webcam, o código converte a imagem para RGB, processa a imagem com MediaPipe para obter as landmarks (pontos-chave da mão), e mapeia a posição dos pontos da mão para a tela.
-
-Movimentação do Cursor: O dedo indicador (landmark 9) é mapeado para controlar a posição do cursor.
-
-Condicional para Clique: O sistema checa se os pontos dos dedos estão dobrados (a posição Y dos dedos é maior do que a base dos mesmos). Se todos os dedos indicados estiverem dobrados, um clique é acionado.
-
-## Configuração e Instalação
-### Requisitos
-Python 3.8 ou superior
-Bibliotecas Python:
-opencv-python
-mediapipe
-pyautogui
-
-
+## Setup and Installation
+### Requirements
+Python 3.8 or higher (Python 3.12 recommended)
