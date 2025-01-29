@@ -5,25 +5,38 @@ This project implements a gesture control system using a webcam to detect and tr
 [View Releases](https://github.com/Gustavo-michel/HandMotion/releases)
 
 ## Technologies Used
-Python: Programming language used for project development.
+- Python: Programming language used for project development.
 
-OpenCV: Library used for video capture and image processing.
+- OpenCV: Library used for video capture and image processing.
 
-MediaPipe: Google's framework used for hand detection and tracking.
+- Tensorflow: Library to load the model and predict gestures.
 
-PyAutoGUI: Library used for mouse control on the operating system.
+- Numpy: Library to deal with arrays and mathematical things.
+
+- MediaPipe: Google's framework used for hand detection and tracking.
+
+- PyAutoGUI: Library used for mouse control on the operating system.
 
 ## Features
-Real-Time Hand Detection: The project uses the webcam to capture real-time video and track the user's hand.
+- Real-Time Hand Detection: The project uses the webcam to capture real-time video and track the user's hand.
 
-Cursor Control: The hand movement detected by MediaPipe is mapped to the computer screen. The index finger (point 9 in MediaPipe) is used to move the mouse cursor.
+- Cursor Control: The hand movement detected by MediaPipe is mapped to the computer screen. the center point of hand (point 9 in MediaPipe) is used to move the mouse cursor with  aspecific gesture (e.g., leave your hand open).
 
-Click Execution: A specific gesture (all fingers closed) triggers a mouse click.
+- Left-Click Gesture: A specific gesture (e.g., closing all fingers) triggers a left mouse click.
 
-Safety Margin: A "safety margin" adjustment prevents the cursor from moving beyond the edges of the screen.
+- Right-Click Gesture: A distinct gesture (e.g., lifting the thumb and thumb while keeping the other fingers closed) triggers a right mouse click.
 
-Executable Generation: The project can be packaged as an executable to facilitate execution on different machines without the need to configure Python dependencies.
+- Next Tab Gesture: A gesture (e.g., make a right arrow) allows you to navigate to the next tab in your browser or application.
 
-## Setup and Installation
-### Requirements
-Python 3.8 or higher (Python 3.12 recommended)
+- Previous Tab Gesture: A gesture (e.g., make a left arrow) allows you to navigate to the previous tab in your browser or application.
+
+- Page Up Gesture: A gesture (e.g., moving the hand upward) scrolls the page up.
+
+- Page Down Gesture: A gesture (e.g., moving the hand downward) scrolls the page down.
+
+Note: Detailed instructions on how to perform all gestures are provided in the  [User Guide](Shortly!). Make sure to refer to it for a seamless experience!
+
+## Setup and Installation 
+### Requirements (for developers)
+Python 3.8 or higher (Python 3.12 recommended).
+requirements.txt libraries.
