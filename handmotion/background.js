@@ -5,12 +5,12 @@ async function checkServerStatus() {
     try {
         const response = await fetch(`${serverUrl}/status`);
         if (response.ok) {
-            console.log("Servidor Python ativo.");
+            console.log("Active Python server.");
             return true;
         }
-        throw new Error("Falha ao acessar o servidor.");
+        throw new Error("Failed to access the server.");
     } catch (error) {
-        console.error("Erro de conexão:", error.message);
+        console.error("Connection error:", error.message);
         return false;
     }
 }

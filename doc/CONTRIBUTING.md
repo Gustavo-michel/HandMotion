@@ -1,10 +1,10 @@
-# Guia de Contribuição
+# Contribution Guide
 
-Agradecemos seu interesse em contribuir para este projeto! Para garantir um processo eficiente e colaborativo, siga estas diretrizes:
+Thank you for your interest in contributing to this project! To ensure an efficient and collaborative process, follow these guidelines:
 
-## 🛠 Configuração do Ambiente
+## 🛠 Environment Configuration
 
-1. **Crie um Ambiente Virtual**:
+1. **Create a Virtual Environment**:
    ```bash
    python -m venv env
    source env/bin/activate  # Linux/macOS
@@ -12,29 +12,29 @@ Agradecemos seu interesse em contribuir para este projeto! Para garantir um proc
     env/Scripts/Activate  # Windows
    ```
 
-2. **Instale as Dependências**:
+2. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure Pré-commit** (opcional):
+3. **Configure Pre-commit** (Optional):
    ```bash
    pre-commit install
    ```
 
-## 🌿 Estratégia de Branches
+## 🌿 Branch Strategy
 
-- **Branch Base**: Use `main` ou `develop` como base
+- **Branch Base**: Use `main` or `develop` as a basis
 - **Padrão de Nomes**:
   ```bash
-  feature/nome-da-feature
-  fix/nome-da-correcao
-  hotfix/descricao-urgente
+  feature/feature-name
+  fix/fix-name
+  hotfix/urgent-description
   ```
 
-## ✏️ Convenção de Commits
+## ✏️ Commit Convention
 
-Siga o padrão **[Conventional Commits](https://www.conventionalcommits.org/)**:
+Follow the pattern **[Conventional Commits](https://www.conventionalcommits.org/)**:
 ```bash
 <type>[optional scope]: <description>
 ```
@@ -49,41 +49,41 @@ feat(auth): add password recovery feature
 Refs: #123
 ```
 
-## 🔄 Processo de Pull Request
+## 🔄 Pull Request Process
 
-1. Sincronize sua branch com a branch base
-2. Garanta que todos os testes passem:
+1. Sync your branch with the base branch
+2. Ensure all tests pass:
    ```bash
    pytest --cov
    ```
-3. Atualize a documentação relevante
-4. Descreva no PR:
-   - Motivação das mudanças
-   - Impacto técnico
-   - Relação com issues (ex: Closes #123)
+3. Update relevant documentation
+4. Describe in the PR:
+   - Motivation for changes
+   - Technical impact
+   - Relationship with issues (e.g. Closes #123)
 
-### Validação
+### Validation
 
-- [ ] Script `Handtracking.py ou HandMotion.py` executado com sucesso
-- [ ] Screenshot do rastreamento em ação (anexada no PR)
-- [ ] Teste manual na interface do Flask (se aplicável)
+- [ ] Script `Handtracking.py or HandMotion.py` executed successfully
+- [ ] Screenshot of tracking in action (attached in PR)
+- [ ] Manual testing in the Flask interface (if applicable)
 
-## 🐛 Reportando Issues
+## 🐛 Reporting Issues
 
-Inclua:
-1. Versão do projeto
-2. Passos para reproduzir
-3. Comportamento esperado vs atual
-4. Capturas de tela (se aplicável)
+Include:
+1. Project version
+2. Steps to reproduce
+3. Expected vs current behavior
+4. Screenshots (if applicable)
 
-## 📜 Guia do Produto
+## 📜 Product Guide
 
-Para saver como o produto funciona siga [Guia do Usuario](UserGuide.rst).
+To save how the product works follow [User Guide](UserGuide.rst).
 
-## 📄 Licenciamento
+## 📄 Licensing
 
-Ao contribuir, você concorda em licenciar sua contribuição sob os termos da [LICENÇA](../LICENSE) do projeto.
+By contributing, you agree to license your contribution under the terms of the project's [LICENSE](../LICENSE).
 
 ---
 
-Obrigado por contribuir! 💚
+Thanks for contributing! 💚

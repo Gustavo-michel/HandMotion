@@ -1,6 +1,9 @@
 handmotion/training/
-handmotion/images/
-executable/
+hanmotion/images/
+doc/
+output/
+LICENSE
+README.MD
 
 *.exe
 *.bin
