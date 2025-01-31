@@ -40,9 +40,9 @@ toggleButton.addEventListener("click", function () {
     .then((data) => {
         console.log(data.status);
 
-        if (data.status.includes("iniciado")) {
+        if (data.status.includes("Started")) {
             isTracking = true;
-        } else if (data.status.includes("parado")) {
+        } else if (data.status.includes("Stopped")) {
             isTracking = false;
         } else {
             console.error(data.status);
@@ -55,21 +55,21 @@ toggleButton.addEventListener("click", function () {
             setInterval(fetchGesture, 1000);
         }
     })
-    .catch((error) => console.error("Erro ao controlar o servidor:", error));
+    .catch((error) => console.error("Error controlling the server:", error));
 });
 
 function fetchGesture() {
     fetch("http://localhost:5000/status")
         .then((response) => response.json())
         .then((data) => {
-            if (data.status === "Servidor ativo") {
+            if (data.status === "Active server") {
                 gestureElement.textContent = `${data.gesture || "None"}`;
             } else {
-                gestureElement.textContent = "Erro ao obter o gesto.";
+                gestureElement.textContent = "Error getting gesture.";
             }
         })
         .catch((error) => {
-            console.error("Erro ao buscar o gesto:", error);
-            gestureElement.textContent = "Erro de conexão.";
+            console.error("Error when searching for gesture:", error);
+            gestureElement.textContent = "Connection error.";
         });
 }
