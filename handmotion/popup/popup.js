@@ -22,7 +22,7 @@ function updateUI() {
     } else {
         statusElement.textContent = "Offline Tracking";
         toggleButton.textContent = "Enable tracking";
-        statusElement.style.color = "#ff5722";
+        statusElement.style.color = "#7D2C2F";
     }
 }
 
