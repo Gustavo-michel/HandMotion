@@ -1,5 +1,4 @@
-# ![Banner Handmotion](https://github.com/user-attachments/assets/43d3c10d-1c01-44f8-a090-4ee8d814eb70)
-
+![Banner_Handmotion](https://github.com/user-attachments/assets/c720f6e7-bc0d-4af4-8f0a-82d71d790ddd)
 This project implements a gesture control system using a webcam to detect and track hands in real time. The hand movement is converted into mouse cursor movements, and a specific finger gesture can be used to perform mouse clicks. Additionally, the project includes an executable, allowing the system to be used without the need to manually run the code in a development environment.
 
 ## Executable
