@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandMotion Extension</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <h3>HandMotion</h3>
+    <div id="status">Status: <span id="status-text"></span></div>
+    <div id="gesture">Current gesture: <span id="gesture-text">None</span></div>
+    <button id="toggle-button"></button>
+    <div id="video-container">
+        <img id="camera-feed" src="http://localhost:5000/video_feed" alt="Feed da câmera">
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

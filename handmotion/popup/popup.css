@@ -1,0 +1,88 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 10px;
+    width: 380px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    border: 1px solid #333333;
+    box-sizing: border-box;
+}
+
+h3 {
+    margin: -10px -10px 0 -10px;
+    width: calc(100% + 20px);
+    font-size: 2em;
+    color: #38b6ff;
+    font-family: 'Roboto', sans-serif;
+    background-color: #333333;
+    padding: 15px 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+#status, #gesture {
+    margin: 10px 0;
+    font-size: 1.1em;
+    padding: 10px 0;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#status-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #99282c;
+    font-family: 'Roboto', sans-serif;
+}
+
+#gesture-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #28a745;
+    font-family: 'Roboto', sans-serif;
+}
+
+#toggle-button {
+    padding: 14px 18px;
+    font-size: 1.1em;
+    color: #fff;
+    background-color: #2C5F7D;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+}
+
+#toggle-button:hover {
+    background-color: #0F3A52;
+}
+
+#toggle-button:active {
+    background-color: #003f7f;
+}
+
+#video-container {
+    margin-top: 20px;
+    width: 100%;
+    height: 350px;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid #38b6ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

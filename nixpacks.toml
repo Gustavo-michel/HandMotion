@@ -1,0 +1,5 @@
+[start]
+cmd = "gunicorn app:app"
+
+[build]
+pythonVersion = "3.11"
