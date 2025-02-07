@@ -6,9 +6,10 @@ import mediapipe as mp
 from collections import deque
 import tensorflow as tf
 import numpy as np
+import os
+os.environ['DISPLAY'] = ':0'
 import pyautogui
 import time
-import os
 import sys
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
