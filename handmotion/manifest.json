@@ -6,7 +6,8 @@
     "permissions": [
       "storage",
       "scripting",
-      "activeTab"
+      "activeTab",
+      "nativeMessaging"
     ],
     "host_permissions": ["http://localhost:5000/*"],
     "background": {
