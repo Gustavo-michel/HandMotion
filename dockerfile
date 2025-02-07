@@ -1,23 +1,20 @@
-FROM python:3.12-slim
-
-RUN apt-get update && apt-get install -y \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    libgl1-mesa-glx \
-    libgtk2.0-0 \
-    libgtk-3-0 \
-    ffmpeg \
-    libopencv-dev \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.11-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv venv
+ENV VIRTUAL_ENV=/app/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
 COPY . .
 
