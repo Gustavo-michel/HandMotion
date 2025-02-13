@@ -7,8 +7,6 @@ RUN apt-get update && apt-get install -y \
     scrot \
     python3-tk
 
-ENV DISPLAY=:99
-
 WORKDIR /app
 
 COPY requirements.txt .

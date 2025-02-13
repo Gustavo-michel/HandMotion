@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f9f9f9;
     color: #333;
     margin: 0;
@@ -18,14 +20,18 @@ body {
 h3 {
     margin: -10px -10px 0 -10px;
     width: calc(100% + 20px);
-    font-size: 2em;
+    font-size: 1.5em;
     color: #38b6ff;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
     background-color: #333333;
     padding: 15px 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     box-sizing: border-box;
+}
+#title-2 {
+    color: #f9f9f9;
 }
 
 #status, #gesture {
