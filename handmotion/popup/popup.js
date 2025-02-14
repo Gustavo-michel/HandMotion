@@ -71,7 +71,7 @@ function fetchGesture() {
     });
 }
 
-function connectToNativeApp() {
+function generateFrames() {
     const port = chrome.runtime.connectNative('com.handmotion.native');
 
     port.onMessage.addListener((message) => {
@@ -85,4 +85,63 @@ function connectToNativeApp() {
     });
 }
 
-connectToNativeApp();
+generateFrames();
+
+let nativePort = null;
+
+function connectNative() {
+  if (!nativePort) {
+    nativePort = chrome.runtime.connectNative("com.handmotion.native");
+    nativePort.onMessage.addListener((message) => {
+      if (message.frame) {
+        cameraFeed.src = `data:image/jpeg;base64,${message.frame}`;
+      }
+      if (message.gesture) {
+        gestureElement.textContent = message.gesture;
+      }
+      if (message.status) {
+        console.log("Status:", message.status);
+      }
+    });
+    nativePort.onDisconnect.addListener(() => {
+      console.error("Desconectado do aplicativo nativo");
+      nativePort = null;
+    });
+  }
+}
+
+function sendCommand(command) {
+  if (nativePort) {
+    nativePort.postMessage(command);
+  } else {
+    console.error("Conexão nativa não estabelecida");
+  }
+}
+
+chrome.storage.local.get(["isTracking"], function (result) {
+  if (result.isTracking !== undefined) {
+    isTracking = result.isTracking;
+    updateUI();
+  }
+  connectNative();
+});
+
+function updateUI() {
+  if (isTracking) {
+    statusElement.textContent = "Online tracking";
+    toggleButton.textContent = "Disable Tracking";
+    statusElement.style.color = "#28a745";
+  } else {
+    statusElement.textContent = "Offline Tracking";
+    toggleButton.textContent = "Enable tracking";
+    statusElement.style.color = "#7D2C2F";
+  }
+}
+
+toggleButton.addEventListener("click", function () {
+  const action = isTracking ? "stop" : "start";
+  sendCommand({ action });
+  // O host nativo responderá com o status e, via onMessage, atualizaremos a interface
+});
+
+

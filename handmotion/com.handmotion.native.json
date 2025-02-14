@@ -1,8 +1,0 @@
-{
-    "name": "com.handmotion.native",
-    "description": "HandMotion Native Host",
-    "path": "../output/handmotion.exe",
-    "type": "stdio",
-    "allowed_origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf/"]
-  }
-  
