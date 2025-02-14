@@ -2,6 +2,7 @@ let isTracking = false;
 const statusElement = document.getElementById("status-text");
 const toggleButton = document.getElementById("toggle-button");
 const gestureElement = document.getElementById("gesture-text");
+const cameraFeed = document.getElementById("camera-feed");
 
 chrome.storage.local.get(['isTracking'], function(result) {
     if (result.isTracking !== undefined) {
@@ -29,7 +30,7 @@ function updateUI() {
 toggleButton.addEventListener("click", function () {
     const action = isTracking ? "stop" : "start";
     
-    chrome.runtime.sendNativeMessage("com.my_company.my_application", { action }, function(response) {
+    chrome.runtime.sendNativeMessage("com.handmotion.native", { action }, function(response) {
         if (chrome.runtime.lastError) {
             console.error("Erro na comunicação nativa:", chrome.runtime.lastError.message);
             return;
@@ -55,7 +56,7 @@ toggleButton.addEventListener("click", function () {
 });
 
 function fetchGesture() {
-    chrome.runtime.sendNativeMessage("com.my_company.my_application", { action: "status" }, function(response) {
+    chrome.runtime.sendNativeMessage("com.handmotion.native", { action: "status" }, function(response) {
         if (chrome.runtime.lastError) {
             console.error("Erro na comunicação nativa:", chrome.runtime.lastError.message);
             gestureElement.textContent = "Connection error.";
@@ -63,9 +64,25 @@ function fetchGesture() {
         }
         
         if (response.status === "Active server") {
-            gestureElement.textContent = response.gesture || "None";
+            gestureElement.textContent = response.gesture_name_str || "None";
         } else {
             gestureElement.textContent = "Error getting gesture.";
         }
     });
 }
+
+function connectToNativeApp() {
+    const port = chrome.runtime.connectNative('com.handmotion.native');
+
+    port.onMessage.addListener((message) => {
+        if (message.frame) {
+            cameraFeed.src = `data:image/jpeg;base64,${message.frame}`;
+        }
+    });
+
+    port.onDisconnect.addListener(() => {
+        console.error("Desconectado do aplicativo nativo");
+    });
+}
+
+connectToNativeApp();

@@ -1,6 +1,3 @@
-"""
-This script is responsible for compiling the code into its executable version that can be run for the user.
-"""
 import cv2
 import mediapipe as mp
 import tensorflow as tf
@@ -10,41 +7,11 @@ from collections import deque
 import threading
 import time
 import sys
+import json
+import base64
 import os
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
-loading_complete = threading.Event()
-
-def loading_screen(loading_complete_event):
-    """
-    Displays a loading screen.
-    """
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    splash_path = os.path.join(base_path, "image", "screen.png")
-    splash_img = cv2.imread(splash_path)
-
-    if splash_img is None:
-        splash_img = np.zeros((480, 640, 3), dtype=np.uint8)
-        cv2.putText(
-            splash_img,
-            "Carregando, aguarde...",
-            (50, 240),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 255, 255),
-            2,
-            cv2.LINE_AA
-        )
-    
-    while not loading_complete_event.is_set():
-        cv2.imshow("Splash Screen", splash_img)
-        if cv2.waitKey(100) & 0xFF == ord('q'):
-            break
-    cv2.destroyWindow("Splash Screen")
 
 class HandTracking:
     def __init__(self):
@@ -152,32 +119,82 @@ class HandTracking:
                 gesture_names = ["Left Click", "Right Click", "Previous Tab", "Next Tab","Roll page up", "Roll page down", "Move Mouse"]
                 gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
 
-                cv2.imshow("Hand tracking", img)
-
                 return gesture_name_str
     
         return None
+    
+    def encode_frame(self):
+        """Codifica o frame em JPEG e retorna a string em base64."""
+        check, frame = self.video.read()
+
+        frame = cv2.flip(frame, 1)
+        _, buffer = cv2.imencode('.jpg', frame)
+        frame_base64 = base64.b64encode(buffer).decode('utf-8')
+        return frame_base64
+    
+def read_message():
+    """Lê uma mensagem do stdin e a decodifica do JSON."""
+    try:
+        line = sys.stdin.readline()
+        if line:
+            return json.loads(line)
+    except Exception as e:
+        print(f"Erro ao ler mensagem: {e}", file=sys.stderr)
+    return {}
+
+def send_message(message):
+    try:
+        encoded_content = json.dumps(message).encode('utf-8')
+        sys.stdout.buffer.write(len(encoded_content).to_bytes(4, byteorder='little'))
+        sys.stdout.buffer.write(encoded_content)
+        sys.stdout.buffer.flush()
+    except Exception as e:
+        print("Erro ao enviar mensagem: {}".format(e), file=sys.stderr)
+
+
+def track_gestures():
+    while process:
+        global gesture
+        gesture = tracking.run()
+
 
 if __name__ == "__main__":
-    splash_thread = threading.Thread(target=loading_screen, args=(loading_complete,), daemon=True)
-    splash_thread.start()
-
     tracking = HandTracking()
+    process = False
+    gesture = None
 
     while tracking.model is None:
         time.sleep(0.1)
-    
-    loading_complete.set()
 
-    splash_thread.join()
+    while True:
+        message = read_message()
+        if not message:
+            continue
 
-    try:
-        while True:
-            tracking.run()
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    except KeyboardInterrupt:
-        pass
-    finally:
-        tracking.video.release()
-        cv2.destroyAllWindows()
+        action = message.get("action")
+
+        if action == "start":
+            if process:
+                send_message({"status": "App is already running"}), 200
+            try:
+                process = True
+                tracking_thread = threading.Thread(target=track_gestures, daemon=True)
+                tracking_thread.start()
+                send_message({"status": "Started"}), 200
+            except Exception as e:
+                send_message({"status": "Error when starting the app", "error": str(e)}), 500
+
+        elif action == "stop":
+            if process is False:
+                send_message({"status": "App is already stopped"}), 200
+            try:
+                process = False
+                tracking_thread = None
+                send_message({"status": "Stopped"}), 200
+            except Exception as e:
+                send_message({"status": "Error stopping the app", "error": str(e)}), 500
+
+        elif action == "status":
+            send_message({"status": "Active server", "gesture": gesture or "No gestures detected"}), 200
+        else:
+            send_message({"status": "Unknown command"})
