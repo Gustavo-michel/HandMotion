@@ -1,3 +1,6 @@
+"""
+This script is responsible for compiling the code into its executable version that can be run for the user.
+"""
 import cv2
 import mediapipe as mp
 import tensorflow as tf
@@ -7,12 +10,41 @@ from collections import deque
 import threading
 import time
 import sys
-import json
-import base64
 import os
-import signal
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
+loading_complete = threading.Event()
+
+def loading_screen(loading_complete_event):
+    """
+    Displays a loading screen.
+    """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    splash_path = os.path.join(base_path, "image", "screen.png")
+    splash_img = cv2.imread(splash_path)
+
+    if splash_img is None:
+        splash_img = np.zeros((480, 640, 3), dtype=np.uint8)
+        cv2.putText(
+            splash_img,
+            "Carregando, aguarde...",
+            (50, 240),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255, 255, 255),
+            2,
+            cv2.LINE_AA
+        )
+    
+    while not loading_complete_event.is_set():
+        cv2.imshow("Splash Screen", splash_img)
+        if cv2.waitKey(100) & 0xFF == ord('q'):
+            break
+    cv2.destroyWindow("Splash Screen")
 
 class HandTracking:
     def __init__(self):
@@ -64,13 +96,13 @@ class HandTracking:
             5: lambda: pyautogui.press('pgdn')   # Scroll down
         }
 
-        if predicted_class in actions and (time.time() - self.last_click_time > 0.5):
+        if predicted_class in actions and (time.time() - self.last_click_time > 0.7):
             actions[predicted_class]()
             self.last_click_time = time.time()
         
         return False
     
-    def tracking(self):
+    def run(self):
         """Method to process the video and return the detected gesture.
 
         Returns:
@@ -79,6 +111,12 @@ class HandTracking:
         check, img = self.video.read()
         if not check:
             raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
+
+        if self.model is None:
+            cv2.putText(img, "Carregando modelo...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
+                        1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.imshow("Hand tracking", img)
+            return None
         
         imgRGB = cv2.resize(img, (320, 240))
         imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
@@ -114,84 +152,32 @@ class HandTracking:
                 gesture_names = ["Left Click", "Right Click", "Previous Tab", "Next Tab","Roll page up", "Roll page down", "Move Mouse"]
                 gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
 
+                cv2.imshow("Hand tracking", img)
+
                 return gesture_name_str
-
-        return None
     
-def read_message():
-    try:
-        length_bytes = sys.stdin.buffer.read(4)
-        if not length_bytes:
-            return None
-        length = int.from_bytes(length_bytes, byteorder='little')
-        return json.loads(sys.stdin.buffer.read(length).decode('utf-8'))
-    except Exception as e:
-        print(f"Erro lendo mensagem: {e}", file=sys.stderr)
         return None
-
-def send_message(message):
-    try:
-        encoded = json.dumps(message).encode('utf-8')
-        sys.stdout.buffer.write(len(encoded).to_bytes(4, byteorder='little'))
-        sys.stdout.buffer.write(encoded)
-        sys.stdout.buffer.flush()
-    except Exception as e:
-        print(f"Erro enviando mensagem: {e}", file=sys.stderr)
-
-def camera(hand_tracking):
-    while True:
-        try:
-            check, frame = hand_tracking.video.read()
-            if not check:
-                print("Error capturing the frame.")
-                break
-
-            imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = hand_tracking.Hand.process(imgRGB)
-
-            if results.multi_hand_landmarks:
-                for points in results.multi_hand_landmarks:
-                    hand_tracking.mpDraw.draw_landmarks(
-                        frame, points, mp.solutions.hands.HAND_CONNECTIONS,
-                        hand_tracking.mpDraw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=4),
-                        hand_tracking.mpDraw.DrawingSpec(color=(0, 0, 255), thickness=2))
-            frame = cv2.flip(frame, 1)
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
-            yield base64.b64encode(frame_bytes).decode('utf-8')
-        except Exception as e:
-            print(f"Error capturing the frame: {e}")
-            break
-
-def track_gestures():
-    while process:
-        gesture_text = tracker.tracking()
-        send_message({"gesture": gesture_text})
-        time.sleep(0.03)
-
 
 if __name__ == "__main__":
-    tracker = HandTracking()
-    process = False
+    splash_thread = threading.Thread(target=loading_screen, args=(loading_complete,), daemon=True)
+    splash_thread.start()
 
-    while tracker.model is None:
+    tracking = HandTracking()
+
+    while tracking.model is None:
         time.sleep(0.1)
+    
+    loading_complete.set()
 
-    while True:
-        message = read_message()
-        if message:
-            action = message.get("action")
+    splash_thread.join()
 
-            if action == "start":
-                process = True
-                tracking_thread = threading.Thread(target=track_gestures, daemon=True)
-                tracking_thread.start()
-
-            elif action == "stop":
-                process = False
-                if tracking_thread:
-                    tracking_thread.join()
-                    tracking_thread = None
-                cv2.destroyAllWindows()
-                sys.exit(0)
-
+    try:
+        while True:
+            tracking.run()
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    except KeyboardInterrupt:
+        pass
+    finally:
+        tracking.video.release()
+        cv2.destroyAllWindows()

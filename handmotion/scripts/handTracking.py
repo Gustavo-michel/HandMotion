@@ -15,7 +15,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 class HandTracking:
     def __init__(self):
-        self.video = cv2.VideoCapture(0)
+        self.video = cv2.VideoCapture()
         if not self.video.isOpened():
             raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
 
@@ -60,7 +60,7 @@ class HandTracking:
             5: lambda: pyautogui.press('pgdn')   # Scroll down
         }
 
-        if predicted_class in actions and (time.time() - self.last_click_time > 0.5):
+        if predicted_class in actions and (time.time() - self.last_click_time > 0.7):
             actions[predicted_class]()
             self.last_click_time = time.time()
         

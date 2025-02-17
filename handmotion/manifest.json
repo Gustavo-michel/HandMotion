@@ -1,23 +1,24 @@
 {
-    "manifest_version": 3,
-    "name": "HandMotion",
-    "description": "gesture tracker to interact with the browser",
-    "version": "1.0.0",
-    "permissions": [
-      "storage",
-      "scripting",
-      "activeTab",
-      "nativeMessaging"
-    ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "popup/popup.html",
-      "default_icon": {
-        "16": "images/logo.png",
-        "48": "images/logo.png",
-        "128": "images/logo.png"
-      }
+  "manifest_version": 3,
+  "name": "HandMotion",
+  "description": "gesture tracker to interact with the browser",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "nativeMessaging"
+  ],
+  "host_permissions": ["http://localhost:5000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "images/logo.png",
+      "48": "images/logo.png",
+      "128": "images/logo.png"
     }
   }
+}
