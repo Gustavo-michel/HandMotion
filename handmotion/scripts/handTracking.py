@@ -15,7 +15,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 class HandTracking:
     def __init__(self):
-        self.video = cv2.VideoCapture()
+        self.video = cv2.VideoCapture(0, cv2.CAP_FFMPEG)
         if not self.video.isOpened():
             raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
 
