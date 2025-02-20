@@ -15,15 +15,9 @@ chrome.storage.local.get(['isTracking'], function(result) {
 });
 
 function updateUI() {
-    if (isTracking) {
-        statusElement.textContent = "Online tracking";
-        toggleButton.textContent = "Disable Tracking";
-        statusElement.style.color = "#28a745";
-    } else {
-        statusElement.textContent = "Offline Tracking";
-        toggleButton.textContent = "Enable tracking";
-        statusElement.style.color = "#7D2C2F";
-    }
+    statusElement.textContent = isTracking ? "Online Tracking" : "Offline Tracking";
+    toggleButton.textContent = isTracking ? "Disable Tracking" : "Enable Tracking";
+    statusElement.style.color = isTracking ? "#28a745" : "#7D2C2F";
 }
 
 toggleButton.addEventListener("click", function () {
