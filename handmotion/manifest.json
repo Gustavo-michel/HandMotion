@@ -5,9 +5,9 @@
   "version": "1.0.0",
   "permissions": [
     "storage",
+    "background",
     "scripting",
-    "activeTab",
-    "nativeMessaging"
+    "offscreen"
   ],
   "host_permissions": ["http://localhost:5000/*"],
   "background": {
@@ -20,5 +20,11 @@
       "48": "images/logo.png",
       "128": "images/logo.png"
     }
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["socket.io.min.js"],
+      "matches": ["http://localhost:5000/*"]
+    }
+  ]
 }

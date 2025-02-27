@@ -163,3 +163,4 @@ cython_debug/
 #.idea/
 
 handmotion/com.handmotion.native.json
+handmotion/libs/
