@@ -116,12 +116,9 @@ function startStreaming() {
 
         sendCtx.drawImage(video, 0, 0, sendCanvas.width, sendCanvas.height);
         const imageData = sendCanvas.toDataURL("image/jpeg");
-
-        sendToServer(imageData);
+        
+        if(isTracking){
+            sendToServer(imageData);
+        }
     }, 100);
 }
-
-  
-
-
-

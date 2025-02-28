@@ -7,41 +7,46 @@ import time
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins=["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf"])
+socketio = SocketIO(app, cors_allowed_origins=["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "*"])
 
 hand_tracker = HandTracking()
 gesture = None
 
+tracking_active = False
+tracking_thread = None
+
 def track_gestures():
     global gesture
     
-    while True:
+    while tracking_active:
         gesture = hand_tracker.run()
         time.sleep(0.1) 
 
 @app.route('/control', methods=['POST'])
 def control():
-    tracking_thread = None
+    global tracking_thread, tracking_active
     data = request.json
     action = data.get('action')
 
     if action == "start":
-        if tracking_thread and tracking_thread.is_alive():
+        if tracking_active:
             return jsonify({"status": "Tracking already started."}), 200
         try:
+            tracking_active = True
             tracking_thread = threading.Thread(target=track_gestures, daemon=True)
             tracking_thread.start()
-            return jsonify({"status": "Sucess started"}), 200
+            return jsonify({"status": "Success started"}), 200
         except Exception as e:
             return jsonify({"status": "Error when starting the app", "error": str(e)}), 500
 
     elif action == "stop":
-        if not tracking_thread or not tracking_thread.is_alive():
+        if not tracking_active:
             return jsonify({"status": "Tracking already stopped."}), 200
         try:
+            tracking_active = False
             tracking_thread.join()
             tracking_thread = None
-            return jsonify({"status": "Sucess stopped"}), 200
+            return jsonify({"status": "Success stopped"}), 200
         except Exception as e:
             return jsonify({"status": "Error stopping the app", "error": str(e)}), 500
 
@@ -57,7 +62,8 @@ def handle_disconnect():
 
 @socketio.on('video')
 def handle_video(data):
-    hand_tracker.receive_frame(data)
+    if tracking_active:
+        hand_tracker.receive_frame(data)
 
 @app.route('/status', methods=['GET'])
 def status_check():
