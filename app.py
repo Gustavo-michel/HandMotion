@@ -1,13 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 import threading
 from handmotion.scripts.handTracking import HandTracking
-from flask_socketio import SocketIO
 import time
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins=["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "*"])
+CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "*"]}})
 
 hand_tracker = HandTracking()
 gesture = None
@@ -52,18 +50,9 @@ def control():
 
     return jsonify({"status": "Invalid action"}), 400
 
-@socketio.on('connect')
-def handle_connect():
-    print("Cliente conectado via Socket.IO")
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print("Cliente desconectado via Socket.IO")
-
-@socketio.on('video')
-def handle_video(data):
-    if tracking_active:
-        hand_tracker.receive_frame(data)
+@app.route('/video_feed')
+def video_feed():
+    return Response(hand_tracker.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/status', methods=['GET'])
 def status_check():
@@ -71,4 +60,4 @@ def status_check():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)

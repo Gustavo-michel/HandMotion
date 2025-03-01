@@ -1,25 +1,7 @@
 let isTracking = false;
 const statusElement = document.getElementById("status-text");
 const toggleButton = document.getElementById("toggle-button");
-const gestureElement = document.getElementById("gesture-text"); 
-const video = document.createElement("video");
-video.setAttribute("autoplay", "");
-video.setAttribute("playsinline", "");
-document.body.appendChild(video);
-
-const socket = io("http://localhost:5000"); 
-
-socket.on('connect', () => {
-    console.log("Socket.IO conectado.");
-});
-
-socket.on('disconnect', () => {
-    console.log("Socket.IO desconectado.");
-});
-
-socket.on('error', (error) => {
-    console.error("Erro no Socket.IO:", error);
-});
+const gestureElement = document.getElementById("gesture-text");
 
 // maintain state
 chrome.storage.local.get(['isTracking'], function(result) {
@@ -82,43 +64,3 @@ function fetchGesture() {
         });
 }
 
-// Get streaming video
-navigator.mediaDevices.getUserMedia({ video: true })
-  .then((stream) => {
-    video.srcObject = stream;
-    startStreaming();
-  })
-  .catch((err) => console.error("Erro ao acessar a câmera:", err));
-
-function sendToServer(imageData) {
-    socket.emit("video", { image: imageData });
-}
-
-function startStreaming() {
-    const displayCanvas = document.createElement("canvas");
-    const displayCtx = displayCanvas.getContext("2d");
-
-    const sendCanvas = document.createElement("canvas");
-    const sendCtx = sendCanvas.getContext("2d");
-
-    document.body.appendChild(displayCanvas);
-
-    video.style.display = "none";
-
-    setInterval(() => {
-        displayCanvas.width = sendCanvas.width = video.videoWidth;
-        displayCanvas.height = sendCanvas.height = video.videoHeight;
-
-        displayCtx.save();
-        displayCtx.scale(-1, 1);
-        displayCtx.drawImage(video, -displayCanvas.width, 0, displayCanvas.width, displayCanvas.height);
-        displayCtx.restore();
-
-        sendCtx.drawImage(video, 0, 0, sendCanvas.width, sendCanvas.height);
-        const imageData = sendCanvas.toDataURL("image/jpeg");
-        
-        if(isTracking){
-            sendToServer(imageData);
-        }
-    }, 100);
-}
