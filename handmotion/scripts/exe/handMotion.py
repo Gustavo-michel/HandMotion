@@ -17,8 +17,10 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 loading_complete = threading.Event()
 
 def loading_screen(loading_complete_event):
-    """
-    Displays a loading screen.
+    """Displays a loading screen.
+
+    Args:
+        loading_complete_event (set): verify if loading complete
     """
     try:
         base_path = sys._MEIPASS

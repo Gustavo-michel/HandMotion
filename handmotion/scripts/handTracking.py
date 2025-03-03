@@ -101,7 +101,7 @@ class HandTracking:
         
         return False
 
-    def run(self):
+    def tracking(self):
         """
         Method to process the video and return the detected gesture.
         """

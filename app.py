@@ -13,11 +13,14 @@ gesture = None
 tracking_active = False
 tracking_thread = None
 
-def track_gestures():
+def trackGestures():
+    """
+    initialize tracking
+    """
     global gesture
     
     while tracking_active:
-        gesture = hand_tracker.run()
+        gesture = hand_tracker.tracking()
         time.sleep(0.1) 
 
 @app.route('/control', methods=['POST'])
@@ -31,7 +34,7 @@ def control():
             return jsonify({"status": "Tracking already started."}), 200
         try:
             tracking_active = True
-            tracking_thread = threading.Thread(target=track_gestures, daemon=True)
+            tracking_thread = threading.Thread(target=trackGestures, daemon=True)
             tracking_thread.start()
             return jsonify({"status": "Success started"}), 200
         except Exception as e:
@@ -52,10 +55,19 @@ def control():
 
 @app.route('/video_feed')
 def video_feed():
+    """Collects the video transmission passing to the client side
+    Returns:
+        jpeg: video frames
+    """
     return Response(hand_tracker.generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/status', methods=['GET'])
 def status_check():
+    """Check server status
+
+    Returns:
+        json(dict): server status and current gesture
+    """
     return jsonify({"status": "Active server", "gesture": gesture or "No gestures detected"}), 200
 
 

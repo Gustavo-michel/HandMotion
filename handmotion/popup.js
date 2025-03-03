@@ -3,7 +3,7 @@ const statusElement = document.getElementById("status-text");
 const toggleButton = document.getElementById("toggle-button");
 const gestureElement = document.getElementById("gesture-text");
 
-// maintain state
+// keeps the last state of the popup 
 chrome.storage.local.get(['isTracking'], function(result) {
     if (result.isTracking !== undefined) {
         isTracking = result.isTracking;
@@ -21,7 +21,7 @@ function updateUI() {
     statusElement.style.color = isTracking ? "#28a745" : "#7D2C2F";
 }
 
-// Control tracker enabled
+// Controls tracking activation
 toggleButton.addEventListener("click", function () {
     isTracking = !isTracking;
     const action = isTracking ? "start" : "stop";
@@ -47,7 +47,7 @@ toggleButton.addEventListener("click", function () {
 });
 
 
-// Get gesture status
+// check server status and gestures
 function fetchGesture() {
     fetch("http://localhost:5000/status")
         .then((response) => response.json())
