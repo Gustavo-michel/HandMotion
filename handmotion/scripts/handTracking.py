@@ -112,42 +112,45 @@ class HandTracking:
         check, img = self.video.read()
         if not check:
             raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
-
         
-        imgRGB = cv2.resize(img, (320, 240))
-        imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
-        results = self.Hand.process(imgRGB)
-        handsPoints = results.multi_hand_landmarks
+        try:
+            imgRGB = cv2.resize(img, (320, 240))
+            imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
+            results = self.Hand.process(imgRGB)
+            handsPoints = results.multi_hand_landmarks
 
-        if handsPoints:
-            for points in handsPoints:
-                self.mpDraw.draw_landmarks(img, points, mp.solutions.hands.HAND_CONNECTIONS)
+            if handsPoints:
+                for points in handsPoints:
+                    self.mpDraw.draw_landmarks(img, points, mp.solutions.hands.HAND_CONNECTIONS)
 
-                gesture = []
-                for _, cord in enumerate(points.landmark):
-                    gesture.extend([cord.x, cord.y, cord.z])
+                    gesture = []
+                    for _, cord in enumerate(points.landmark):
+                        gesture.extend([cord.x, cord.y, cord.z])
 
-                gesture_array = np.array([gesture])
-                prediction = self.model.predict(gesture_array, verbose=0)
-                predicted_class = np.argmax(prediction)
+                    gesture_array = np.array([gesture])
+                    prediction = self.model.predict(gesture_array, verbose=0)
+                    predicted_class = np.argmax(prediction)
 
-                if predicted_class == 6:  # Mouse movement
-                        hand_center = points.landmark[9]
-                        screen_x = self.screen_width - int(hand_center.x * (self.screen_width - 2 * self.safe_margin)) + self.safe_margin
-                        screen_y = int(hand_center.y * (self.screen_height - 2 * self.safe_margin)) + self.safe_margin
+                    if predicted_class == 6:  # Mouse movement
+                            hand_center = points.landmark[9]
+                            screen_x = self.screen_width - int(hand_center.x * (self.screen_width - 2 * self.safe_margin)) + self.safe_margin
+                            screen_y = int(hand_center.y * (self.screen_height - 2 * self.safe_margin)) + self.safe_margin
 
-                        self.mouse_positions.append((screen_x, screen_y))
+                            self.mouse_positions.append((screen_x, screen_y))
 
-                        avg_x = int(sum(pos[0] for pos in self.mouse_positions) / len(self.mouse_positions))
-                        avg_y = int(sum(pos[1] for pos in self.mouse_positions) / len(self.mouse_positions))
+                            avg_x = int(sum(pos[0] for pos in self.mouse_positions) / len(self.mouse_positions))
+                            avg_y = int(sum(pos[1] for pos in self.mouse_positions) / len(self.mouse_positions))
 
-                        pyautogui.moveTo(avg_x, avg_y, duration=0.0, _pause=False)
-                else:
-                    self.actions(predicted_class)
+                            pyautogui.moveTo(avg_x, avg_y, duration=0.0, _pause=False)
+                    else:
+                        self.actions(predicted_class)
 
-                gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
+                    gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
 
-                return gesture_name_str
+                    return gesture_name_str
 
-        return None
-    
+            return None
+        except Exception as e:
+            print(f"Error in tracking: {e}")
+            return None
+        

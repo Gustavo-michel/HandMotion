@@ -59,7 +59,7 @@ function fetchGesture() {
             }
         })
         .catch((error) => {
-            console.error("Error when searching for gesture:", error);
+            console.error("Error with server:", error);
             gestureElement.textContent = "Connection error.";
         });
 }
