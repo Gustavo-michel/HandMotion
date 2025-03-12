@@ -10,14 +10,14 @@ import os
 import pyautogui
 import time
 import sys
+from queue import Empty
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 class HandTracking:
-    def __init__(self):
-        self.video = cv2.VideoCapture(0)
-        if not self.video.isOpened():
-            raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
+    def __init__(self, frame_queue):
+        self.frame_queue = frame_queue
+        self.gesture = None
         
         hand = mp.solutions.hands
         self.Hand = hand.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
@@ -26,7 +26,7 @@ class HandTracking:
 
         self.screen_width, self.screen_height = pyautogui.size()
         self.safe_margin = 5
-        self.mouse_positions = deque(maxlen=5)
+        self.mouse_positions = deque(maxlen=3)
         self.last_click_time = time.time()
         # self.video.set(cv2.CAP_PROP_FPS, 30)
         # self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 640) 
@@ -35,6 +35,7 @@ class HandTracking:
         self.model = None
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.model_path = os.path.join(script_dir, '../model/gesture_model.h5')
+        
 
     def load_model(self):
         """
@@ -47,36 +48,7 @@ class HandTracking:
             except Exception as e:
                 print(f"Erro ao carregar o modelo: {e}")
                 sys.exit(1)
-
-    def generate_frames(self):
-        """
-        Generates frames for display in a Flask route.
-        """
-        while True:
-            try:
-                check, frame = self.video.read()
-                if not check:
-                    print("Error capturing the frame.")
-                    break
-
-                imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                results = self.Hand.process(imgRGB)
-
-                if results.multi_hand_landmarks:
-                    for points in results.multi_hand_landmarks:
-                        self.mpDraw.draw_landmarks(
-                            frame, points, mp.solutions.hands.HAND_CONNECTIONS,
-                            self.mpDraw.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=4),
-                            self.mpDraw.DrawingSpec(color=(0, 0, 255), thickness=2))
-                frame = cv2.flip(frame, 1)
-                _, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            except Exception as e:
-                print(f"Error capturing the frame: {e}")
-                break
-    
+        
     def actions(self, predicted_class):
         """Defines actions corresponding to detected gestures.
 
@@ -109,12 +81,11 @@ class HandTracking:
         self.load_model()
         gesture_names = ["Left Click", "Right Click", "Previous Tab", "Next Tab","Roll page up", "Roll page down", "Move Mouse"]
         
-        check, img = self.video.read()
-        if not check:
-            raise RuntimeError("Error accessing the camera. Check the camera connection or index.")
-        
-        try:
-            imgRGB = cv2.resize(img, (320, 240))
+        try:    
+            img = self.frame_queue.get(timeout=2)
+            print(f"[DEBUG] Frame recebido: {img.shape}")
+
+            imgRGB = cv2.resize(img, (160, 120))
             imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
             results = self.Hand.process(imgRGB)
             handsPoints = results.multi_hand_landmarks
@@ -150,7 +121,10 @@ class HandTracking:
                     return gesture_name_str
 
             return None
+
+        except Empty:
+            print(f"Fila de frames vazia")
+            return "Aguardando frames..."
         except Exception as e:
             print(f"Error in tracking: {e}")
             return None
-        

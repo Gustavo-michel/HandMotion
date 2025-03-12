@@ -5,8 +5,9 @@
   "version": "1.0.0",
   "permissions": [
     "storage",
-    "background",
-    "scripting"
+    "scripting",
+    "activeTab",
+    "offscreen"
   ],
   "host_permissions": ["http://localhost:5000/*"],
   "background": {

@@ -3,11 +3,15 @@ from flask_cors import CORS
 import threading
 from handmotion.scripts.handTracking import HandTracking
 import time
+import queue
+import cv2
+import numpy as np
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "*"]}})
+CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "http://localhost:5000", "*"]}})
 
-hand_tracker = HandTracking()
+frame_queue = queue.Queue(maxsize=10)
+hand_tracker = HandTracking(frame_queue)
 gesture = None
 
 tracking_active = False
@@ -17,6 +21,7 @@ def trackGestures():
     """
     initialize tracking
     """
+    global tracking_active
     global gesture
     
     while tracking_active:
@@ -45,7 +50,6 @@ def control():
             return jsonify({"status": "Tracking already stopped."}), 200
         try:
             tracking_active = False
-            tracking_thread.join()
             tracking_thread = None
             return jsonify({"status": "Success stopped"}), 200
         except Exception as e:
@@ -69,6 +73,33 @@ def status_check():
         json(dict): server status and current gesture
     """
     return jsonify({"status": "Active server", "gesture": gesture or "No gestures detected"}), 200
+
+@app.route('/upload', methods=['POST'])
+def upload_frame():
+    if request.content_type == "image/jpeg":
+        nparr = np.frombuffer(request.data, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if frame is not None:
+            frame = cv2.resize(frame, (640, 480))
+            frame_queue.put(frame)
+            return "Frame received and processed.", 200
+        else:
+            return "Could not decode image", 400
+        
+    elif 'frame' in request.files:
+        file = request.files['frame']
+        file_bytes = file.read()
+        nparr = np.frombuffer(file_bytes, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if frame is not None:
+            frame = cv2.resize(frame, (640, 480))
+            frame_queue.put(frame)
+            return "Frame received and processed.", 200
+        else:
+            return "Could not decode image", 400
+    else:
+        return "No frame sent!", 400
+
 
 
 if __name__ == '__main__':
