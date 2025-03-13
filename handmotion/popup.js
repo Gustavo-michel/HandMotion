@@ -8,24 +8,6 @@ const gestureElement = document.getElementById("gesture-text");
 const video = document.getElementById('camera-feed');
 
 
-// keeps the last state of the popup
-chrome.storage.local.get(['isTracking'], function(result) {
-    if (result.isTracking !== undefined) {
-        isTracking = result.isTracking;
-        updateUI();
-    }
-
-    if (isTracking) {
-        startGestureFetching();
-    }
-});
-
-function updateUI() {
-    statusElement.textContent = isTracking ? "Online Tracking" : "Offline Tracking";
-    toggleButton.textContent = isTracking ? "Disable Tracking" : "Enable Tracking";
-    statusElement.style.color = isTracking ? "#28a745" : "#7D2C2F";
-}
-
 function startGestureFetching() {
     if (gestureInterval) {
         clearInterval(gestureInterval);
@@ -40,6 +22,11 @@ function stopGestureFetching() {
     }
 }
 
+function updateUI() {
+    statusElement.textContent = isTracking ? "Online Tracking" : "Offline Tracking";
+    toggleButton.textContent = isTracking ? "Disable Tracking" : "Enable Tracking";
+    statusElement.style.color = isTracking ? "#28a745" : "#7D2C2F";
+}
 
 // Controls tracking activation
 toggleButton.addEventListener("click", function () {
@@ -74,7 +61,7 @@ toggleButton.addEventListener("click", function () {
 
 // check server status and gestures
 function fetchGesture() {
-    fetch("http://localhost:5000/status")
+    fetch("http://localhost:5000/status")   
         .then((response) => response.json())
         .then((data) => {
             if (data.status === "Active server") {
@@ -92,6 +79,19 @@ function fetchGesture() {
                 chrome.storage.local.set({ isTracking });
                 updateUI();
                 stopGestureFetching();
+                chrome.runtime.sendMessage({ action: "stop" });
             }
         });
 }
+
+// keeps the last state of the popup
+chrome.storage.local.get(['isTracking'], function(result) {
+    if (result.isTracking !== undefined) {
+        isTracking = result.isTracking;
+        updateUI();
+    }
+
+    if (isTracking) {
+        startGestureFetching();
+    }
+});

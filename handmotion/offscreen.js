@@ -1,3 +1,5 @@
+const socket = io("http://localhost:5000");
+
 document.addEventListener("DOMContentLoaded", function() {
     let video = document.getElementById('video');
     let canvas = document.createElement('canvas');
@@ -19,16 +21,21 @@ document.addEventListener("DOMContentLoaded", function() {
                   canvas.height = video.videoHeight;
                   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                   canvas.toBlob((blob) => {
-                      let formData = new FormData();
-                      formData.append("frame", blob, "frame.jpg");
-
-                      fetch("http://localhost:5000/upload", {
-                          method: "POST",
-                          body: formData
-                      })
-                      .then(response => response.text())
-                      .then(data => console.log("Frame sent:", data))
-                      .catch(error => console.error("Error sending frame:", error));
+                      // Envio via HTTP
+                    //   let formData = new FormData();
+                    //   formData.append("frame", blob, "frame.jpg");
+                    //   fetch("http://localhost:5000/upload", {
+                    //       method: "POST",
+                    //       body: formData
+                    //   })
+                    //   .then(response => response.text())
+                    //   .then(data => console.log("Frame sent via HTTP:", data))
+                    //   .catch(error => console.error("Error sending frame:", error));
+                      
+                      // Envio via websocket
+                      blob.arrayBuffer().then(buffer => {
+                          socket.emit("frame", buffer);
+                      });
                   }, "image/jpeg", 0.8);
               }, 100);
           })
@@ -36,15 +43,14 @@ document.addEventListener("DOMContentLoaded", function() {
               console.error("Error accessing webcam:", error);
           });
     }
-
+  
     function stopCapture() {
         isCapturing = false;
         video.srcObject?.getTracks().forEach(track => track.stop());
         console.log("Captura de vídeo parada.");
     }
-
-    // 🚀 Listener para receber mensagens do Background Script
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  
+    chrome.runtime.onMessage.addListener((message) => {
         if (message.action === "startCapture") {
             console.log("Recebido startCapture no Offscreen.");
             startCapture();

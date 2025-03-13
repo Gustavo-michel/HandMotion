@@ -13,8 +13,8 @@ async function ensureOffscreenDocument() {
     console.log("Offscreen document criado com sucesso.");
 }
 
-// Escuta mensagens do popup
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+// Listener messages from popup
+chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'start') {
         ensureOffscreenDocument().then(() => {
             console.log("Enviando mensagem para iniciar captura.");

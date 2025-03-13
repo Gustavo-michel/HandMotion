@@ -10,6 +10,7 @@ import os
 import pyautogui
 import time
 import sys
+import threading
 from queue import Empty
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -18,15 +19,16 @@ class HandTracking:
     def __init__(self, frame_queue):
         self.frame_queue = frame_queue
         self.gesture = None
+        self.tracking_active = False
+        self.tracking_thread = None
         
         hand = mp.solutions.hands
         self.Hand = hand.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
         self.mpDraw = mp.solutions.drawing_utils
-        self.frame = None 
 
         self.screen_width, self.screen_height = pyautogui.size()
         self.safe_margin = 5
-        self.mouse_positions = deque(maxlen=3)
+        self.mouse_positions = deque(maxlen=5)
         self.last_click_time = time.time()
         # self.video.set(cv2.CAP_PROP_FPS, 30)
         # self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 640) 
@@ -77,13 +79,11 @@ class HandTracking:
         """
         Method to process the video and return the detected gesture.
         """
-
         self.load_model()
         gesture_names = ["Left Click", "Right Click", "Previous Tab", "Next Tab","Roll page up", "Roll page down", "Move Mouse"]
         
         try:    
             img = self.frame_queue.get(timeout=2)
-            print(f"[DEBUG] Frame recebido: {img.shape}")
 
             imgRGB = cv2.resize(img, (160, 120))
             imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
@@ -123,8 +123,37 @@ class HandTracking:
             return None
 
         except Empty:
-            print(f"Fila de frames vazia")
-            return "Aguardando frames..."
+            print(f"empty frame queue")
+            return "Aguardando Video..."
         except Exception as e:
             print(f"Error in tracking: {e}")
             return None
+        
+    def track_gestures(self):
+        """Starts a tracking thread"""
+        while self.tracking_active:
+            self.gesture = self.tracking()
+            time.sleep(0.1)
+
+    def start_tracking(self):
+        """Start tracking from control endpoint"""
+        if self.tracking_active:
+            return "Tracking already started."
+        try:
+            self.tracking_active = True
+            self.tracking_thread = threading.Thread(target=self.track_gestures, daemon=True)
+            self.tracking_thread.start()
+            return "Success started"
+        except Exception as e:
+            return f"Error when starting the app: {str(e)}"
+
+    def stop_tracking(self):
+        """Stop tracking in control endpoint"""
+        if not self.tracking_active:
+            return "Tracking already stopped."
+        try:
+            self.tracking_active = False
+            self.tracking_thread = None
+            return "Success stopped"
+        except Exception as e:
+            return f"Error stopping the app: {str(e)}"
