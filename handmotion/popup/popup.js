@@ -42,7 +42,7 @@ toggleButton.addEventListener("click", function () {
     })
     .then((response) => response.json())
     .then((data) => {
-        console.log(`Ação ${action} enviada: ${data.status}`);
+        console.log(`Action ${action} sending: ${data.status}`);
 
         chrome.storage.local.set({ isTracking });
         updateUI();
@@ -55,7 +55,7 @@ toggleButton.addEventListener("click", function () {
             stopGestureFetching();
         }
     })
-    .catch((error) => console.error("Erro ao controlar o servidor:", error));
+    .catch((error) => console.error("Error to control server:", error));
 });
 
 
@@ -65,14 +65,14 @@ function fetchGesture() {
         .then((response) => response.json())
         .then((data) => {
             if (data.status === "Active server") {
-                gestureElement.textContent = `${data.gesture || "Nenhum"}`;
+                gestureElement.textContent = `${data.gesture || "None"}`;
             } else {
-                gestureElement.textContent = "Erro ao obter gesto.";
+                gestureElement.textContent = "Error to get gestures.";
             }
         })
         .catch((error) => {
-            console.error("Erro com o servidor:", error);
-            gestureElement.textContent = "Erro de conexão.";
+            console.error("error with the server:", error);
+            gestureElement.textContent = "Connection error.";
 
             if (isTracking) {
                 isTracking = false;

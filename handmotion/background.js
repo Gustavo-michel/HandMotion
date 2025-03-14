@@ -1,27 +1,27 @@
 async function ensureOffscreenDocument() {
     if (await chrome.offscreen.hasDocument()) {
-        console.log("Documento offscreen já existe.");
+        console.log("Offscreen document already exists.");
         return;
     }
 
     await chrome.offscreen.createDocument({
         url: "offscreen/offscreen.html",
         reasons: ["USER_MEDIA"], 
-        justification: "Captura de vídeo da webcam para análise de gestos"
+        justification: "Webcam video capture for gesture analysis."
     });
 
-    console.log("Offscreen document criado com sucesso.");
+    console.log("Offscreen document created successfully.");
 }
 
 // Listener messages from popup
 chrome.runtime.onMessage.addListener((message) => {
     if (message.action === 'start') {
         ensureOffscreenDocument().then(() => {
-            console.log("Enviando mensagem para iniciar captura.");
+            console.log("Sending message to start capture.");
             chrome.runtime.sendMessage({ action: 'startCapture' });
         });
     } else if (message.action === 'stop') {
-        console.log("Enviando mensagem para parar captura.");
+        console.log("Sending message to stop capture.");
         chrome.runtime.sendMessage({ action: 'stopCapture' });
     }
 });

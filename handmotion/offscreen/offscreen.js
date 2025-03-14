@@ -35,18 +35,13 @@ document.addEventListener("DOMContentLoaded", function() {
     function stopCapture() {
         isCapturing = false;
         video.srcObject?.getTracks().forEach(track => track.stop());
-        console.log("Captura de vídeo parada.");
     }
   
     chrome.runtime.onMessage.addListener((message) => {
         if (message.action === "startCapture") {
-            console.log("Recebido startCapture no Offscreen.");
             startCapture();
         } else if (message.action === "stopCapture") {
-            console.log("Recebido stopCapture no Offscreen.");
             stopCapture();
         }
     });
-
-    console.log("Offscreen document carregado e aguardando mensagens.");
 });
