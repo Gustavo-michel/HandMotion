@@ -38,7 +38,8 @@ def handle_frame(data):
     Args:
         data (Blob, ArrayBuffer): frames in Array via WebSocket.
     """
-    if process_frame(data):
+    if hand_tracker:
+        hand_tracker.add_frame(data)
         emit("frame_ack", {"message": "Frame received"})
     else:
         emit("frame_error", {"message": "Could not decode image"})

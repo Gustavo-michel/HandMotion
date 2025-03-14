@@ -21,18 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
                   canvas.height = video.videoHeight;
                   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                   canvas.toBlob((blob) => {
-                      // Envio via HTTP
-                    //   let formData = new FormData();
-                    //   formData.append("frame", blob, "frame.jpg");
-                    //   fetch("http://localhost:5000/upload", {
-                    //       method: "POST",
-                    //       body: formData
-                    //   })
-                    //   .then(response => response.text())
-                    //   .then(data => console.log("Frame sent via HTTP:", data))
-                    //   .catch(error => console.error("Error sending frame:", error));
-                      
-                      // Envio via websocket
                       blob.arrayBuffer().then(buffer => {
                           socket.emit("frame", buffer);
                       });

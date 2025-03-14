@@ -11,7 +11,8 @@ import pyautogui
 import time
 import sys
 import threading
-from queue import Empty
+from queue import Empty, Full
+
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
@@ -74,6 +75,22 @@ class HandTracking:
             self.last_click_time = time.time()
         
         return False
+    
+    def add_frame(self, frame_data):
+        # Decodifica o frame a partir do buffer binário
+        nparr = np.frombuffer(frame_data, np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if frame is not None:
+            try:
+                self.frame_queue.put_nowait(frame)
+            except Full:
+                try:
+                    self.frame_queue.get_nowait()
+                except Empty:
+                    pass
+                self.frame_queue.put_nowait(frame)
+        else:
+            print("Erro ao decodificar o frame.")
 
     def tracking(self):
         """
@@ -82,58 +99,54 @@ class HandTracking:
         self.load_model()
         gesture_names = ["Left Click", "Right Click", "Previous Tab", "Next Tab","Roll page up", "Roll page down", "Move Mouse"]
         
-        try:    
-            img = self.frame_queue.get(timeout=2)
-
-            imgRGB = cv2.resize(img, (160, 120))
-            imgRGB = cv2.cvtColor(imgRGB, cv2.COLOR_BGR2RGB)
-            results = self.Hand.process(imgRGB)
-            handsPoints = results.multi_hand_landmarks
-
-            if handsPoints:
-                for points in handsPoints:
-                    self.mpDraw.draw_landmarks(img, points, mp.solutions.hands.HAND_CONNECTIONS)
-
-                    gesture = []
-                    for _, cord in enumerate(points.landmark):
-                        gesture.extend([cord.x, cord.y, cord.z])
-
-                    gesture_array = np.array([gesture])
-                    prediction = self.model.predict(gesture_array, verbose=0)
-                    predicted_class = np.argmax(prediction)
-
-                    if predicted_class == 6:  # Mouse movement
-                            hand_center = points.landmark[9]
-                            screen_x = self.screen_width - int(hand_center.x * (self.screen_width - 2 * self.safe_margin)) + self.safe_margin
-                            screen_y = int(hand_center.y * (self.screen_height - 2 * self.safe_margin)) + self.safe_margin
-
-                            self.mouse_positions.append((screen_x, screen_y))
-
-                            avg_x = int(sum(pos[0] for pos in self.mouse_positions) / len(self.mouse_positions))
-                            avg_y = int(sum(pos[1] for pos in self.mouse_positions) / len(self.mouse_positions))
-
-                            pyautogui.moveTo(avg_x, avg_y, duration=0.0, _pause=False)
-                    else:
-                        self.actions(predicted_class)
-
-                    gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
-
-                    return gesture_name_str
-
-            return None
-
-        except Empty:
-            print(f"empty frame queue")
-            return "Aguardando Video..."
-        except Exception as e:
-            print(f"Error in tracking: {e}")
-            return None
-        
-    def track_gestures(self):
-        """Starts a tracking thread"""
         while self.tracking_active:
-            self.gesture = self.tracking()
-            time.sleep(0.1)
+            try:    
+                img = self.frame_queue.get(timeout=0.2)
+
+                imgResized = cv2.resize(img, (160, 120))
+                imgRGB = cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB)
+                results = self.Hand.process(imgRGB)
+                handsPoints = results.multi_hand_landmarks
+
+                if handsPoints:
+                    for points in handsPoints:
+                        self.mpDraw.draw_landmarks(img, points, mp.solutions.hands.HAND_CONNECTIONS)
+
+                        gesture = []
+                        for _, cord in enumerate(points.landmark):
+                            gesture.extend([cord.x, cord.y, cord.z])
+
+                        gesture_array = np.array([gesture])
+                        prediction = self.model.predict(gesture_array, verbose=0)
+                        predicted_class = np.argmax(prediction)
+
+                        if predicted_class == 6:  # Mouse movement
+                                hand_center = points.landmark[9]
+                                screen_x = self.screen_width - int(hand_center.x * (self.screen_width - 2 * self.safe_margin)) + self.safe_margin
+                                screen_y = int(hand_center.y * (self.screen_height - 2 * self.safe_margin)) + self.safe_margin
+
+                                self.mouse_positions.append((screen_x, screen_y))
+
+                                avg_x = int(sum(pos[0] for pos in self.mouse_positions) / len(self.mouse_positions))
+                                avg_y = int(sum(pos[1] for pos in self.mouse_positions) / len(self.mouse_positions))
+
+                                pyautogui.moveTo(avg_x, avg_y, duration=0.0, _pause=False)
+                        else:
+                            self.actions(predicted_class)
+
+                        gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
+
+                        self.gesture = gesture_name_str
+
+                else:
+                    self.gesture = None
+
+            except Empty:
+                print(f"empty frame queue")
+                continue
+            except Exception as e:
+                print(f"Error in tracking: {e}")
+                continue
 
     def start_tracking(self):
         """Start tracking from control endpoint"""
@@ -141,7 +154,7 @@ class HandTracking:
             return "Tracking already started."
         try:
             self.tracking_active = True
-            self.tracking_thread = threading.Thread(target=self.track_gestures, daemon=True)
+            self.tracking_thread = threading.Thread(target=self.tracking, daemon=True)
             self.tracking_thread.start()
             return "Success started"
         except Exception as e:
