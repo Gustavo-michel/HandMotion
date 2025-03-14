@@ -2,9 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from handmotion.scripts.handTracking import HandTracking
 import queue
-import cv2
 from flask_socketio import SocketIO, emit
-import numpy as np
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "http://localhost:5000", "*"]}})
@@ -21,15 +19,6 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     print("Client disconnected.")
-
-def process_frame(frame_bytes):
-    nparr = np.frombuffer(frame_bytes, np.uint8)
-    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    if frame is not None:
-        frame = cv2.resize(frame, (640, 480))
-        frame_queue.put(frame)
-        return True
-    return False
 
 @socketio.on('frame')
 def handle_frame(data):

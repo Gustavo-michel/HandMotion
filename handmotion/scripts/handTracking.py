@@ -77,7 +77,6 @@ class HandTracking:
         return False
     
     def add_frame(self, frame_data):
-        # Decodifica o frame a partir do buffer binário
         nparr = np.frombuffer(frame_data, np.uint8)
         frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if frame is not None:
@@ -103,7 +102,7 @@ class HandTracking:
             try:    
                 img = self.frame_queue.get(timeout=0.2)
 
-                imgResized = cv2.resize(img, (160, 120))
+                imgResized = cv2.resize(img, (320, 240))
                 imgRGB = cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB)
                 results = self.Hand.process(imgRGB)
                 handsPoints = results.multi_hand_landmarks

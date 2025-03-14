@@ -5,7 +5,7 @@ async function ensureOffscreenDocument() {
     }
 
     await chrome.offscreen.createDocument({
-        url: "offscreen.html",
+        url: "offscreen/offscreen.html",
         reasons: ["USER_MEDIA"], 
         justification: "Captura de vídeo da webcam para análise de gestos"
     });
