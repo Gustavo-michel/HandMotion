@@ -5,8 +5,11 @@ let mediaStream = null;
 const statusElement = document.getElementById("status-text");
 const toggleButton = document.getElementById("toggle-button");
 const gestureElement = document.getElementById("gesture-text");
-const video = document.getElementById('camera-feed');
+const socket = io("http://localhost:5000");
 
+socket.on("processed_frame", data => {
+    document.getElementById("camera-feed").src = `data:image/jpeg;base64,${data.frame}`;
+});
 
 function startGestureFetching() {
     if (gestureInterval) {

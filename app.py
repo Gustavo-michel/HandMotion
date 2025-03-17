@@ -1,16 +1,34 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from handmotion.scripts.handTracking import HandTracking
-import queue
 from flask_socketio import SocketIO, emit
+import cv2
+import base64
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "http://localhost:5000", "*"]}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-frame_queue = queue.Queue(maxsize=30)
-hand_tracker = HandTracking(frame_queue)
-gesture_thread = None
+hand_tracker = HandTracking()
+
+@app.route('/control', methods=['POST'])
+def control():
+    """control start/stop of tracking.
+
+    Returns:
+        Json: _status of process
+    """
+    data = request.json
+    action = data.get('action')
+    if action == "start":
+        result = hand_tracker.start_tracking()
+        print(result)
+        return jsonify({"status": "Success started"}), 200
+    elif action == "stop":
+        result = hand_tracker.stop_tracking()
+        print(result)
+        return jsonify({"status": "Success stopped"}), 200
+    return jsonify({"status": "Invalid action"}), 400
 
 @socketio.on('connect')
 def on_connect():
@@ -22,64 +40,29 @@ def on_disconnect():
 
 @socketio.on('frame')
 def handle_frame(data):
-    """Receive the binary data from the frame
-
-    Args:
-        data (Blob, ArrayBuffer): frames in Array via WebSocket.
+    """
+    Receives the frame in binary format, inserts it into the queue and sends the processed frame.
     """
     if hand_tracker:
         hand_tracker.add_frame(data)
-        emit("frame_ack", {"message": "Frame received"})
+        if hand_tracker.processed_frame is not None:
+            hand_tracker.processed_frame = cv2.flip(hand_tracker.processed_frame, 1)
+            _, buffer = cv2.imencode('.jpg', hand_tracker.processed_frame)
+            jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+            emit("processed_frame", {"frame": jpg_as_text}, broadcast=True)
+        else:
+            emit("frame_error", {"message": "No processed frames available"})
     else:
-        emit("frame_error", {"message": "Could not decode image"})
+        emit("frame_error", {"message": "Hand Tracker not initialized"})
 
-@app.route('/control', methods=['POST'])
-def control():
-    data = request.json
-    action = data.get('action')
-    if action == "start":
-        result = hand_tracker.start_tracking()
-        print(result)
-        return jsonify({"status": "Success started"}), 200
-    elif action == "stop":
-        print("Parando o rastreamento...")
-        result = hand_tracker.stop_tracking()
-        print(result)
-        return jsonify({"status": "Success stopped"}), 200
-    return jsonify({"status": "Invalid action"}), 400
 
 @app.route('/status', methods=['GET'])
 def status_check():
-    """Returns the server status and current gesture."""
+    """
+    Returns the server status and current gesture.
+    """
     return jsonify({"status": "Active server", "gesture": hand_tracker.gesture or "No gestures detected"}), 200
 
-"""
-@app.route('/upload', methods=['POST'])
-def upload_frame():
-    if request.content_type == "image/jpeg":
-        nparr = np.frombuffer(request.data, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        if frame is not None:
-            frame = cv2.resize(frame, (640, 480))
-            frame_queue.put(frame)
-            return "Frame received and processed.", 200
-        else:
-            return "Could not decode image", 400
-        
-    elif 'frame' in request.files:
-        file = request.files['frame']
-        file_bytes = file.read()
-        nparr = np.frombuffer(file_bytes, np.uint8)
-        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        if frame is not None:
-            frame = cv2.resize(frame, (640, 480))
-            frame_queue.put(frame)
-            return "Frame received and processed.", 200
-        else:
-            return "Could not decode image", 400
-    else:
-        return "No frame sent!", 400
-"""
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=5000)

@@ -34,9 +34,10 @@ document.addEventListener("DOMContentLoaded", function() {
   
     function stopCapture() {
         isCapturing = false;
-        video.srcObject?.getTracks().forEach(track => track.stop());
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
     }
-  
     chrome.runtime.onMessage.addListener((message) => {
         if (message.action === "startCapture") {
             startCapture();

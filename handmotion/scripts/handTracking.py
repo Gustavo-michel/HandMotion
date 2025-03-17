@@ -11,29 +11,25 @@ import pyautogui
 import time
 import sys
 import threading
-from queue import Empty, Full
+from queue import Empty, Full, Queue
 
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 class HandTracking:
-    def __init__(self, frame_queue):
-        self.frame_queue = frame_queue
+    def __init__(self):
+        self.frame_queue = Queue(maxsize=30)
         self.gesture = None
         self.tracking_active = False
         self.tracking_thread = None
         
-        hand = mp.solutions.hands
-        self.Hand = hand.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
+        self.Hand = mp.solutions.hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
         self.mpDraw = mp.solutions.drawing_utils
 
         self.screen_width, self.screen_height = pyautogui.size()
         self.safe_margin = 5
         self.mouse_positions = deque(maxlen=5)
         self.last_click_time = time.time()
-        # self.video.set(cv2.CAP_PROP_FPS, 30)
-        # self.video.set(cv2.CAP_PROP_FRAME_WIDTH, 640) 
-        # self.video.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
         self.model = None
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -89,7 +85,7 @@ class HandTracking:
                     pass
                 self.frame_queue.put_nowait(frame)
         else:
-            print("Erro ao decodificar o frame.")
+            print("Error decoding frame.")
 
     def tracking(self):
         """
@@ -100,16 +96,18 @@ class HandTracking:
         
         while self.tracking_active:
             try:    
-                img = self.frame_queue.get(timeout=0.2)
+                frame = self.frame_queue.get(timeout=0.2)
 
-                imgResized = cv2.resize(img, (320, 240))
-                imgRGB = cv2.cvtColor(imgResized, cv2.COLOR_BGR2RGB)
-                results = self.Hand.process(imgRGB)
+                processed_frame = frame.copy()
+
+                frameResized = cv2.resize(frame, (320, 240))
+                frameRGB = cv2.cvtColor(frameResized, cv2.COLOR_BGR2RGB)
+                results = self.Hand.process(frameRGB)
                 handsPoints = results.multi_hand_landmarks
 
                 if handsPoints:
                     for points in handsPoints:
-                        self.mpDraw.draw_landmarks(img, points, mp.solutions.hands.HAND_CONNECTIONS)
+                        self.mpDraw.draw_landmarks(frame, points, mp.solutions.hands.HAND_CONNECTIONS)
 
                         gesture = []
                         for _, cord in enumerate(points.landmark):
@@ -136,10 +134,10 @@ class HandTracking:
                         gesture_name_str = gesture_names[predicted_class] if predicted_class < len(gesture_names) else "Unknown"
 
                         self.gesture = gesture_name_str
-
                 else:
                     self.gesture = None
 
+                self.processed_frame = processed_frame
             except Empty:
                 print(f"empty frame queue")
                 continue
