@@ -22,6 +22,7 @@ class HandTracking:
         self.gesture = None
         self.tracking_active = False
         self.tracking_thread = None
+        self.processed_frame = None
         
         self.Hand = mp.solutions.hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
         self.mpDraw = mp.solutions.drawing_utils

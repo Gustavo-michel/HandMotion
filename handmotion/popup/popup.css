@@ -79,6 +79,23 @@ h3 {
     background-color: #003f7f;
 }
 
+#icon-container {
+    position: absolute;
+    top: 70px;
+    right: 15px;
+}
+
+#info-icon {
+    width: 24px;
+    height: auto;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#info-icon:hover {
+    opacity: 0.7;
+}
+
 #video-container {
     margin-top: 20px;
     width: 100%;

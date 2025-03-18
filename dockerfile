@@ -1,4 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.11-alpine
+
+ENV PYTHONUNBUFFERED True
 
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
@@ -17,4 +19,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--threads", "4", "app:app"]
+CMD exec gunicorn -k eventlet -w 1 -b :$PORT app:app

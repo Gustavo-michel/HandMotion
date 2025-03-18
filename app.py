@@ -1,9 +1,12 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from handmotion.scripts.handTracking import HandTracking
 from flask_socketio import SocketIO, emit
 import cv2
 import base64
+import os
+
+port = int(os.getenv("PORT", 5000))
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "http://localhost:5000", "*"]}})
@@ -46,8 +49,8 @@ def handle_frame(data):
     if hand_tracker:
         hand_tracker.add_frame(data)
         if hand_tracker.processed_frame is not None:
-            hand_tracker.processed_frame = cv2.flip(hand_tracker.processed_frame, 1)
-            _, buffer = cv2.imencode('.jpg', hand_tracker.processed_frame)
+            flipped_frame = cv2.flip(hand_tracker.processed_frame, 1)
+            _, buffer = cv2.imencode('.jpg', flipped_frame)
             jpg_as_text = base64.b64encode(buffer).decode('utf-8')
             emit("processed_frame", {"frame": jpg_as_text}, broadcast=True)
         else:
@@ -65,4 +68,4 @@ def status_check():
 
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=port, allow_unsafe_werkzeug=True)
