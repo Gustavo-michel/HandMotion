@@ -1,6 +1,7 @@
 handmotion/training/
-hanmotion/images/
-doc/
+handmotion/scripts/exe/
+extension/
+docs/
 output/
 LICENSE
 README.MD
@@ -15,6 +16,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+.DS_Store
+*.log
 
 __pycache__/
 *.pyc

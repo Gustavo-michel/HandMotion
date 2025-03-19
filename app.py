@@ -9,7 +9,7 @@ import os
 port = int(os.getenv("PORT", 5000))
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": ["chrome-extension://mahcmoailbbfjannahinbdkkibkajbcf", "http://localhost:5000", "*"]}})
+CORS(app, resources={r"/*": {"origins": ["chrome-extension://bgmanlokleejebndadmkkfibihjddpaf", "http://localhost:5000", "*"]}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 hand_tracker = HandTracking()
