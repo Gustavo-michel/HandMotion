@@ -25,8 +25,6 @@ class HandTracking:
         self.processed_frame = None
         
         self.Hand = mp.solutions.hands.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.7)
-        self.mpDraw = mp.solutions.drawing_utils
-
         self.screen_width, self.screen_height = pyautogui.size()
         self.safe_margin = 5
         self.mouse_positions = deque(maxlen=5)
@@ -108,7 +106,6 @@ class HandTracking:
 
                 if handsPoints:
                     for points in handsPoints:
-                        self.mpDraw.draw_landmarks(frame, points, mp.solutions.hands.HAND_CONNECTIONS)
 
                         gesture = []
                         for _, cord in enumerate(points.landmark):
